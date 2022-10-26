@@ -14,28 +14,30 @@ import java.util.ArrayList;
  *
  * @author jukut
  */
-public class HistoryDAL extends DatabaseConnection{
-    public HistoryDAL()
-    {
+public class HistoryDAL extends DatabaseConnection {
+
+    public HistoryDAL() {
         super();
     }
+
     public int addHistory(History ht) throws SQLException {
         String query = "INSERT INTO history (Mathchld,  PlayTime, StartTime, EndTime, IdPlayerWin, IdPlayerLose) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement p = UserDAL.getConnection().prepareStatement(query);
-        p.setInt(1,ht.getMatchId());
-        p.setTime(2,ht.getPlayTime());
-        p.setDate(3,ht.getStartTime());
-        p.setDate(4,ht.getEndTime());
-        p.setInt(5,ht.getIdPlayerWin());
-        p.setInt(6,ht.getIdPlayerLose());
+        p.setInt(1, ht.getMatchId());
+        p.setTime(2, ht.getPlayTime());
+        p.setDate(3, ht.getStartTime());
+        p.setDate(4, ht.getEndTime());
+        p.setInt(5, ht.getIdPlayerWin());
+        p.setInt(6, ht.getIdPlayerLose());
         int result = p.executeUpdate();
         return result;
     }
+
     public ArrayList loadhistory() throws SQLException {
         String query = "SELECT * FROM history";
         PreparedStatement p = HistoryDAL.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
-        ArrayList<History> historyList = new ArrayList<>();
+        ArrayList<History> historyList = new ArrayList();
         if (rs != null) {
             while (rs.next()) {
                 History ht = new History();
@@ -69,12 +71,12 @@ public class HistoryDAL extends DatabaseConnection{
         }
         return ht;
     }
-    
-    public History findHistoryIdPlayer(int id) throws SQLException {
+
+    public History findHistoryIdPlayer(int id1, int id2) throws SQLException {
         String query = "SELECT * FROM history WHERE IdPlayerWin = ? OR IdPlayerLose = ?";
         PreparedStatement p = HistoryDAL.getConnection().prepareStatement(query);
-        p.setInt(1, id);
-        p.setInt(2, id);
+        p.setInt(1, id1);
+        p.setInt(2, id2);
         ResultSet rs = p.executeQuery();
         History ht = new History();
         if (rs != null) {

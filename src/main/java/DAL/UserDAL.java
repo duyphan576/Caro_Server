@@ -4,7 +4,6 @@
  */
 package DAL;
 
-import DAL.DatabaseConnection;
 import Model.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,7 +49,7 @@ public class UserDAL extends DatabaseConnection {
         String query = "SELECT * FROM User";
         PreparedStatement p = UserDAL.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
-        ArrayList<User> userList = new ArrayList<>();
+        ArrayList<User> userList = new ArrayList();
         if (rs != null) {
             while (rs.next()) {
                 User us = new User();
