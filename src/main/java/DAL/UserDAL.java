@@ -19,6 +19,7 @@ public class UserDAL extends DatabaseConnection {
 
     public UserDAL() {
         super();
+        this.connectDB();
     }
 
     public int addUser(User us) throws SQLException {

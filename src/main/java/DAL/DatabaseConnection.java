@@ -32,7 +32,7 @@ public class DatabaseConnection {
     }
     
         public void connectDB() {
-        String dbPath = "jdbc:mysql://" + host + ":" + port + "/" + dbName + "?useUnicode=yes&characterEncoding=UTF-8";
+        String dbPath = "jdbc:mysql://localhost:3306/caro?zeroDateTimeBehavior=CONVERT_TO_NULL";
         try {
             c = (Connection) DriverManager.getConnection(dbPath, dbUser, dbPassword);
             s = c.createStatement();
