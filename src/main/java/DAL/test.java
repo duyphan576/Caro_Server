@@ -4,19 +4,20 @@
  */
 package DAL;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.util.Date;
 
 /**
  *
  * @author jukut
  */
 public class test {
+
     public static void main(String[] args) {
-        int Mathchld ,IdPlayerWin, IdPlayerLose;  
-        Time PlayTime; 
+        int Mathchld, IdPlayerWin, IdPlayerLose;
+        int PlayTime;
         Date StartTime;
         Date EndTime;
         
+        new HistoryDAL().
     }
 }
