@@ -4,7 +4,8 @@
  */
 package Model;
 
-import java.util.Date;
+import java.sql.Date;
+import java.sql.Time;
 
 /**
  *
@@ -13,14 +14,14 @@ import java.util.Date;
 public class History {
 
     int MatchId;
-    int PlayTime;
+    Time PlayTime;
     Date StartTime, EndTime;
     int IdPlayerWin, IdPlayerLose;
 
     public History() {
     }
 
-    public History(int MatchId, int PlayTime, Date StartTime, Date EndTime, int IdPlayerWin, int IdPlayerLose) {
+    public History(int MatchId, Time PlayTime, Date StartTime, Date EndTime, int IdPlayerWin, int IdPlayerLose) {
         this.MatchId = MatchId;
         this.PlayTime = PlayTime;
         this.StartTime = StartTime;
@@ -37,11 +38,11 @@ public class History {
         this.MatchId = MatchId;
     }
 
-    public int getPlayTime() {
+    public Time getPlayTime() {
         return PlayTime;
     }
 
-    public void setPlayTime(int PlayTime) {
+    public void setPlayTime(Time PlayTime) {
         this.PlayTime = PlayTime;
     }
 

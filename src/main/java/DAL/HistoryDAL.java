@@ -18,6 +18,7 @@ public class HistoryDAL extends DatabaseConnection {
 
     public HistoryDAL() {
         super();
+        this.connectDB();
     }
 
     public int addHistory(History ht) throws SQLException {
@@ -33,7 +34,7 @@ public class HistoryDAL extends DatabaseConnection {
         return result;
     }
 
-    public ArrayList loadhistory() throws SQLException {
+    public ArrayList loadHistory() throws SQLException {
         String query = "SELECT * FROM history";
         PreparedStatement p = HistoryDAL.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
@@ -72,11 +73,11 @@ public class HistoryDAL extends DatabaseConnection {
         return ht;
     }
 
-    public History findHistoryIdPlayer(int id1, int id2) throws SQLException {
+    public History findHistoryIdPlayer(int id) throws SQLException {
         String query = "SELECT * FROM history WHERE IdPlayerWin = ? OR IdPlayerLose = ?";
         PreparedStatement p = HistoryDAL.getConnection().prepareStatement(query);
-        p.setInt(1, id1);
-        p.setInt(2, id2);
+        p.setInt(1, id);
+        p.setInt(2, id);
         ResultSet rs = p.executeQuery();
         History ht = new History();
         if (rs != null) {
