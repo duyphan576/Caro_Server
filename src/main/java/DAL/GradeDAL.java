@@ -37,7 +37,7 @@ public class GradeDAL extends DatabaseConnection {
         return result;
     }
 
-    public Grade setGrade(int id) throws SQLException {
+    public Grade getGrade(int id) throws SQLException {
         String query = "SELECT * FROM grade WHERE UserId = ?";
         PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
         p.setInt(1, id);
@@ -73,22 +73,103 @@ public class GradeDAL extends DatabaseConnection {
         return all;
     }
 
-    public double getWinRate(int id) throws SQLException {
+    public String getWinRate(int id) throws SQLException {
         String query = "SELECT WinMatch FROM Grade where UserID=?";
         PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
         p.setInt(1, id);
         ResultSet rs = p.executeQuery();
-        double rate = 0;
+        float rate = 0;
         if (rs != null) {
             while (rs.next()) {
-                rate = rs.getInt("WinMatch");
+                rate = (float) rs.getInt("WinMatch") / getMatch(id);
             }
         }
-        return rate;
+        return (rate * 100) + "%";
+    }
+
+    public int updateWinMatch(int id) throws SQLException {
+        Grade gr = getGrade(id);
+        String query = "";
+        if (gr.getCurrentWinStreak() < gr.getMaxWinStreak()) {
+            query = "UPDATE grade SET WinMatch = ?, CurrentWinStreak = ? ,CurrentLoseStreak = 0 WHERE UserID = ?";
+            PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+            int value1 = gr.getWinMatch() + 1;
+            int value2 = gr.getCurrentWinStreak() + 1;
+            p.setInt(1, value1);
+            p.setInt(2, value2);
+            p.setInt(3, id);
+            int rs = p.executeUpdate();
+            return rs;
+        } else if ((gr.getCurrentWinStreak() >= gr.getMaxWinStreak())) {
+            query = "UPDATE caro.grade SET `WinMatch` = ?, `CurrentWinStreak` = ?, `MaxWinStreak` = ?, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
+            PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+            int value1 = gr.getWinMatch() + 1;
+            int value2 = gr.getCurrentWinStreak() + 1;
+            p.setInt(1, value1);
+            p.setInt(2, value2);
+            p.setInt(3, value2);
+            p.setInt(4, id);
+            int rs = p.executeUpdate();
+            return rs;
+        }
+        return 0;
+    }
+
+    public int updateLoseMatch(int id) throws SQLException {
+        Grade gr = getGrade(id);
+        String query = "";
+        if (gr.getCurrentLoseStreak() < gr.getMaxLoseStreak()) {
+            query = "UPDATE grade SET LoseMatch = ?, CurrentLoseStreak = ? ,CurrentWinStreak = 0 WHERE UserID = ?";
+            PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+            int value1 = gr.getLoseMatch() + 1;
+            int value2 = gr.getCurrentLoseStreak() + 1;
+            p.setInt(1, value1);
+            p.setInt(2, value2);
+            p.setInt(3, id);
+            int rs = p.executeUpdate();
+            return rs;
+        } else if ((gr.getCurrentLoseStreak() >= gr.getMaxLoseStreak())) {
+            query = "UPDATE caro.grade SET `LoseMatch` = ?, `CurrentLoseStreak` = ?, `MaxLoseStreak` = ?, `CurrentWinStreak` = 0 WHERE `UserId` = ?";
+            PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+            int value1 = gr.getLoseMatch() + 1;
+            int value2 = gr.getCurrentLoseStreak() + 1;
+            p.setInt(1, value1);
+            p.setInt(2, value2);
+            p.setInt(3, value2);
+            p.setInt(4, id);
+            int rs = p.executeUpdate();
+            return rs;
+        }
+        return 0;
+    }
+
+    public int updateDrawMatch(int id) throws SQLException{
+        Grade gr = getGrade(id);
+        String query = "UPDATE grade SET `DrawMatch` = ?, `CurrentWinStreak` = 0, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
+        PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+        int value = gr.getDrawMatch() + 1;
+        p.setInt(1, value);
+        p.setInt(2, id);
+        int rs = p.executeUpdate();
+        return rs;
+    }
+    
+    public int getRank(int id) throws SQLException{
+        int rank = 1;
+        String query = "SELECT UserId, Grade from grade ORDER BY Grade DESC";
+        PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+        ResultSet rs = p.executeQuery();
+        if(rs!=null){
+            while(rs.next()){
+                if(rs.getInt("UserId")==id) return rank;
+                rank++;
+            }
+        }
+        return -1;
     }
     
     public static void main(String[] args) throws SQLException {
         GradeDAL g = new GradeDAL();
-        System.out.println(g.getMatch(1));
+        System.out.println(g.getRank(2));
     }
 }
