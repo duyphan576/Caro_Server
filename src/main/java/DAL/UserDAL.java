@@ -4,7 +4,6 @@
  */
 package DAL;
 
-import DAL.DatabaseConnection;
 import Model.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,11 +18,12 @@ public class UserDAL extends DatabaseConnection {
 
     public UserDAL() {
         super();
+        this.connectDB();
     }
 
     public int addUser(User us) throws SQLException {
         String query = "INSERT INTO user (Username, Password, Nickname, Sex, Birthday, isBlocked) VALUES (?, ?, ?, ?, ?, 1)";
-        PreparedStatement p = UserDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, us.getUserName());
         p.setString(2, us.getPassword());
         p.setString(3, us.getNickname());
@@ -35,7 +35,7 @@ public class UserDAL extends DatabaseConnection {
 
     public int updateUser(User us) throws SQLException {
         String query = "UPDATE user SET Password = ?, Nickname = ?, Sex = ?, Birthday = ?, isBlocked = ? WHERE UserId = ?";
-        PreparedStatement p = UserDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, us.getPassword());
         p.setString(2, us.getNickname());
         p.setInt(3, us.getSex());
@@ -47,9 +47,9 @@ public class UserDAL extends DatabaseConnection {
 
     public ArrayList loadUser() throws SQLException {
         String query = "SELECT * FROM User";
-        PreparedStatement p = UserDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
-        ArrayList<User> userList = new ArrayList<>();
+        ArrayList<User> userList = new ArrayList();
         if (rs != null) {
             while (rs.next()) {
                 User us = new User();
@@ -68,7 +68,7 @@ public class UserDAL extends DatabaseConnection {
 
     public User findUser(int id) throws SQLException {
         String query = "SELECT * FROM User WHERE UserId = ?";
-        PreparedStatement p = UserDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, id);
         ResultSet rs = p.executeQuery();
         User us = new User();
@@ -88,7 +88,7 @@ public class UserDAL extends DatabaseConnection {
     
     public Boolean checkDuplicate(String Username) throws SQLException{
         String query = "SELECT * FROM user WHERE username = ?";
-        PreparedStatement p = UserDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, Username);
         ResultSet rs = p.executeQuery();
         return rs.next();    
@@ -96,7 +96,7 @@ public class UserDAL extends DatabaseConnection {
     
     public Boolean verifyUser(User us) throws SQLException{
         String query = "SELECT * FROM user WHERE username = ? AND password = ? AND isBlocked = 1";
-        PreparedStatement p = UserDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, us.getUserName());
         p.setString(2, us.getPassword());
         ResultSet rs = p.executeQuery();
