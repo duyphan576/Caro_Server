@@ -18,9 +18,10 @@ import java.util.logging.Logger;
  * @author duyph
  */
 public class DatabaseConnection {
-    public static Connection c;
-    private static Statement s;
-    private static PreparedStatement p;
+
+    private Connection c;
+    private Statement s;
+    private PreparedStatement p;
     private String host, port, dbName, dbUser, dbPassword;
 
     public DatabaseConnection() {
@@ -30,9 +31,9 @@ public class DatabaseConnection {
         dbName = "caro";
         dbPassword = "";
     }
-    
-        public void connectDB() {
-        String dbPath = "jdbc:mysql://localhost:3306/caro?zeroDateTimeBehavior=CONVERT_TO_NULL";
+
+    public void connectDB() {
+        String dbPath = "jdbc:mysql://" + host + ":" + port + "/" + dbName + "?useUnicode=yes&characterEncoding=UTF-8";
         try {
             c = (Connection) DriverManager.getConnection(dbPath, dbUser, dbPassword);
             s = c.createStatement();
@@ -61,8 +62,7 @@ public class DatabaseConnection {
         }
     }
 
-    public static Connection getConnection() {
+    public Connection getConnection() {
         return c;
     }
-    
 }

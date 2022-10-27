@@ -13,68 +13,68 @@ import java.sql.Time;
  */
 public class History {
 
-    int MatchId;
-    Time PlayTime;
-    Date StartTime, EndTime;
-    int IdPlayerWin, IdPlayerLose;
+    int matchId;
+    int playTime;
+    Date startTime, endTime;
+    int idPlayerWin, idPlayerLose;
 
     public History() {
     }
 
-    public History(int MatchId, Time PlayTime, Date StartTime, Date EndTime, int IdPlayerWin, int IdPlayerLose) {
-        this.MatchId = MatchId;
-        this.PlayTime = PlayTime;
-        this.StartTime = StartTime;
-        this.EndTime = EndTime;
-        this.IdPlayerWin = IdPlayerWin;
-        this.IdPlayerLose = IdPlayerLose;
+    public History(int matchId, int playTime, Date startTime, Date endTime, int idPlayerWin, int idPlayerLose) {
+        this.matchId = matchId;
+        this.playTime = playTime;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.idPlayerWin = idPlayerWin;
+        this.idPlayerLose = idPlayerLose;
     }
 
     public int getMatchId() {
-        return MatchId;
+        return matchId;
     }
 
-    public void setMatchId(int MatchId) {
-        this.MatchId = MatchId;
+    public void setMatchId(int matchId) {
+        this.matchId = matchId;
     }
 
-    public Time getPlayTime() {
-        return PlayTime;
+    public int getPlayTime() {
+        return playTime;
     }
 
-    public void setPlayTime(Time PlayTime) {
-        this.PlayTime = PlayTime;
+    public void setPlayTime(int playTime) {
+        this.playTime = playTime;
     }
 
     public Date getStartTime() {
-        return StartTime;
+        return startTime;
     }
 
-    public void setStartTime(Date StartTime) {
-        this.StartTime = StartTime;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public Date getEndTime() {
-        return EndTime;
+        return endTime;
     }
 
-    public void setEndTime(Date EndTime) {
-        this.EndTime = EndTime;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public int getIdPlayerWin() {
-        return IdPlayerWin;
+        return idPlayerWin;
     }
 
-    public void setIdPlayerWin(int IdPlayerWin) {
-        this.IdPlayerWin = IdPlayerWin;
+    public void setIdPlayerWin(int idPlayerWin) {
+        this.idPlayerWin = idPlayerWin;
     }
 
     public int getIdPlayerLose() {
-        return IdPlayerLose;
+        return idPlayerLose;
     }
 
-    public void setIdPlayerLose(int IdPlayerLose) {
-        this.IdPlayerLose = IdPlayerLose;
+    public void setIdPlayerLose(int idPlayerLose) {
+        this.idPlayerLose = idPlayerLose;
     }
 }
