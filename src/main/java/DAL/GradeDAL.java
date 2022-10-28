@@ -23,7 +23,7 @@ public class GradeDAL extends DatabaseConnection {
     public int addGrade(Grade gr) throws SQLException {
         String query = "INSERT INTO grade (`UserId`, `Grade`, `WinMatch`, `LoseMatch`, `DrawMatch`, `CurrentWinStreak`, `MaxWinStreak`, `CurrentLoseStreak`, `MaxLoseStreak`)"
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, gr.getUserId());
         p.setInt(2, gr.getGrade());
         p.setInt(3, gr.getWinMatch());
@@ -39,7 +39,7 @@ public class GradeDAL extends DatabaseConnection {
 
     public Grade getGrade(int id) throws SQLException {
         String query = "SELECT * FROM grade WHERE UserId = ?";
-        PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, id);
         ResultSet rs = p.executeQuery();
         Grade gr = new Grade();
@@ -61,7 +61,7 @@ public class GradeDAL extends DatabaseConnection {
 
     public int getMatch(int id) throws SQLException {
         String query = "SELECT WinMatch, LoseMatch, DrawMatch FROM Grade where UserID=?";
-        PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, id);
         ResultSet rs = p.executeQuery();
         int all = 0;
@@ -75,7 +75,7 @@ public class GradeDAL extends DatabaseConnection {
 
     public String getWinRate(int id) throws SQLException {
         String query = "SELECT WinMatch FROM Grade where UserID=?";
-        PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, id);
         ResultSet rs = p.executeQuery();
         float rate = 0;
@@ -92,7 +92,7 @@ public class GradeDAL extends DatabaseConnection {
         String query = "";
         if (gr.getCurrentWinStreak() < gr.getMaxWinStreak()) {
             query = "UPDATE grade SET WinMatch = ?, CurrentWinStreak = ? ,CurrentLoseStreak = 0 WHERE UserID = ?";
-            PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+            PreparedStatement p = this.getConnection().prepareStatement(query);
             int value1 = gr.getWinMatch() + 1;
             int value2 = gr.getCurrentWinStreak() + 1;
             p.setInt(1, value1);
@@ -102,7 +102,7 @@ public class GradeDAL extends DatabaseConnection {
             return rs;
         } else if ((gr.getCurrentWinStreak() >= gr.getMaxWinStreak())) {
             query = "UPDATE caro.grade SET `WinMatch` = ?, `CurrentWinStreak` = ?, `MaxWinStreak` = ?, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
-            PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+            PreparedStatement p = this.getConnection().prepareStatement(query);
             int value1 = gr.getWinMatch() + 1;
             int value2 = gr.getCurrentWinStreak() + 1;
             p.setInt(1, value1);
@@ -120,7 +120,7 @@ public class GradeDAL extends DatabaseConnection {
         String query = "";
         if (gr.getCurrentLoseStreak() < gr.getMaxLoseStreak()) {
             query = "UPDATE grade SET LoseMatch = ?, CurrentLoseStreak = ? ,CurrentWinStreak = 0 WHERE UserID = ?";
-            PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+            PreparedStatement p = this.getConnection().prepareStatement(query);
             int value1 = gr.getLoseMatch() + 1;
             int value2 = gr.getCurrentLoseStreak() + 1;
             p.setInt(1, value1);
@@ -130,7 +130,7 @@ public class GradeDAL extends DatabaseConnection {
             return rs;
         } else if ((gr.getCurrentLoseStreak() >= gr.getMaxLoseStreak())) {
             query = "UPDATE caro.grade SET `LoseMatch` = ?, `CurrentLoseStreak` = ?, `MaxLoseStreak` = ?, `CurrentWinStreak` = 0 WHERE `UserId` = ?";
-            PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+            PreparedStatement p = this.getConnection().prepareStatement(query);
             int value1 = gr.getLoseMatch() + 1;
             int value2 = gr.getCurrentLoseStreak() + 1;
             p.setInt(1, value1);
@@ -146,7 +146,7 @@ public class GradeDAL extends DatabaseConnection {
     public int updateDrawMatch(int id) throws SQLException{
         Grade gr = getGrade(id);
         String query = "UPDATE grade SET `DrawMatch` = ?, `CurrentWinStreak` = 0, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
-        PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         int value = gr.getDrawMatch() + 1;
         p.setInt(1, value);
         p.setInt(2, id);
@@ -157,7 +157,7 @@ public class GradeDAL extends DatabaseConnection {
     public int getRank(int id) throws SQLException{
         int rank = 1;
         String query = "SELECT UserId, Grade from grade ORDER BY Grade DESC";
-        PreparedStatement p = GradeDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
         if(rs!=null){
             while(rs.next()){

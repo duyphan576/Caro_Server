@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -76,7 +75,7 @@ public class HistoryDAL extends DatabaseConnection {
 
     public History findHistoryIdPlayer(int id) throws SQLException {
         String query = "SELECT * FROM history WHERE IdPlayerWin = ? OR IdPlayerLose = ?";
-        PreparedStatement p = HistoryDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, id);
         p.setInt(2, id);
         ResultSet rs = p.executeQuery();
