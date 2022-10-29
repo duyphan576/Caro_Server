@@ -15,10 +15,10 @@ import java.util.concurrent.Executors;
  * @author duyph
  */
 public class Server {
-    
+
     public static int port = 1234;
-    private static ServerSocket server = null;
-    
+    private static ServerSocket server;
+
     public static void main(String[] args) throws IOException, InterruptedException {
         ExecutorService executor = Executors.newCachedThreadPool();
         try {
@@ -28,14 +28,14 @@ public class Server {
             while (true) {
                 Socket socket = server.accept();
                 executor.execute(new ServerThread(socket));
-                Thread.sleep(1000);
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e);
         } finally {
-            if (server != null)
+            if (server != null) {
                 server.close();
+            }
         }
     }
-    
+
 }
