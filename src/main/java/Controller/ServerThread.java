@@ -4,18 +4,14 @@
  */
 package Controller;
 
-import DAL.GradeDAL;
-import DAL.HistoryDAL;
-import DAL.MatchDAL;
-import Model.User;
-import DAL.UserDAL;
-import Model.Grade;
-import Model.History;
-import Model.Match;
-import Model.Room;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import Crypto.ServerCryptography;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -23,160 +19,97 @@ import java.net.Socket;
  */
 public class ServerThread implements Runnable {
 
-    private User user;
-    private Grade grade;
-    private Match match;
-    private History history;
-    private UserDAL userDal;
-    private GradeDAL gradeDal;
-    private MatchDAL matchDal;
-    private HistoryDAL historyDal;
-    private Room room;
-    private Socket socketOfServer;
-    private int clientNumber;
-    private BufferedReader is;
-    private BufferedWriter os;
-    private boolean isClosed;
-    private String clientIP;
+    private static Socket socket;
+//    private static DataInputStream in = null;
+//    private static DataOutputStream out = null;
+//
+//    private static ServerCryptography sc = null;
 
-    public User getUser() {
-        return user;
+    public ServerThread(Socket s) {
+        this.socket = s;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Grade getGrade() {
-        return grade;
-    }
-
-    public void setGrade(Grade grade) {
-        this.grade = grade;
-    }
-
-    public Match getMatch() {
-        return match;
-    }
-
-    public void setMatch(Match match) {
-        this.match = match;
-    }
-
-    public History getHistory() {
-        return history;
-    }
-
-    public void setHistory(History history) {
-        this.history = history;
-    }
-
-    public UserDAL getUserDal() {
-        return userDal;
-    }
-
-    public void setUserDal(UserDAL userDal) {
-        this.userDal = userDal;
-    }
-
-    public GradeDAL getGradeDal() {
-        return gradeDal;
-    }
-
-    public void setGradeDal(GradeDAL gradeDal) {
-        this.gradeDal = gradeDal;
-    }
-
-    public MatchDAL getMatchDal() {
-        return matchDal;
-    }
-
-    public void setMatchDal(MatchDAL matchDal) {
-        this.matchDal = matchDal;
-    }
-
-    public HistoryDAL getHistoryDal() {
-        return historyDal;
-    }
-
-    public void setHistoryDal(HistoryDAL historyDal) {
-        this.historyDal = historyDal;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    public Socket getSocketOfServer() {
-        return socketOfServer;
-    }
-
-    public void setSocketOfServer(Socket socketOfServer) {
-        this.socketOfServer = socketOfServer;
-    }
-
-    public int getClientNumber() {
-        return clientNumber;
-    }
-
-    public void setClientNumber(int clientNumber) {
-        this.clientNumber = clientNumber;
-    }
-
-    public BufferedReader getIs() {
-        return is;
-    }
-
-    public void setIs(BufferedReader is) {
-        this.is = is;
-    }
-
-    public BufferedWriter getOs() {
-        return os;
-    }
-
-    public void setOs(BufferedWriter os) {
-        this.os = os;
-    }
-
-    public boolean isIsClosed() {
-        return isClosed;
-    }
-
-    public void setIsClosed(boolean isClosed) {
-        this.isClosed = isClosed;
-    }
-
-    public String getClientIP() {
-        return clientIP;
-    }
-
-    public void setClientIP(String clientIP) {
-        this.clientIP = clientIP;
-    }
-
-    public ServerThread(Socket socketOfServer, int clientNumber) {
-        this.socketOfServer = socketOfServer;
-        this.clientNumber = clientNumber;
-        System.out.println("Server thread number " + clientNumber + " Started");
-        userDal = new UserDAL();
-        isClosed = false;
-
-        //Trường hợp test máy ở server sẽ lỗi do hostaddress là localhost
-        if (this.socketOfServer.getInetAddress().getHostAddress().equals("127.0.0.1")) {
-            clientIP = "127.0.0.1";
-        } else {
-            clientIP = this.socketOfServer.getInetAddress().getHostAddress();
-        }
-    }
-
+//    public static void start() throws IOException, NoSuchAlgorithmException {
+//        System.out.println("Client " + socket.toString() + " accepted.");
+//        in = new DataInputStream(new DataInputStream(socket.getInputStream()));
+//        out = new DataOutputStream(new DataOutputStream(socket.getOutputStream()));
+//        sc = new ServerCryptography();
+//        sc.generateAsymmetricKeyPair();
+//        byte[] publicKey = sc.getPublicKeyAsByteArray();
+//        push(publicKey);
+//    }
+//
+//    public static void stop() throws IOException {
+//        System.out.println("Closed socket for client " + socket.toString());
+//        in.close();
+//        out.close();
+//        socket.close();
+//    }
+//
+//    public static void process() throws Exception {
+//        while (true) {
+//            int length = in.readInt();                    // read length of incoming message
+//            byte[] encryptedInput = new byte[0];
+//            if (length > 0) {
+//                encryptedInput = new byte[length];
+//                in.readFully(encryptedInput, 0, encryptedInput.length); // read the message
+//            }
+//            //Read from client: byte[] encryptedMsg
+//            String intialMsg = sc.processInitialMsg(encryptedInput);
+//
+//            if (intialMsg.equals("bye")) {
+//                break;
+//            }
+//            System.out.println("Server received: " + intialMsg);
+//            byte[] encryptedOutput = sc.symmetricEncryption("Hi");
+//            push(encryptedOutput);
+//        }
+//    }
+//
+//    public static void push(byte[] msg) throws IOException {
+//        out.writeInt(msg.length);
+//        out.write(msg);
+//        out.flush();
+//    }
     @Override
     public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+        try {
+            System.out.println("Client " + socket.toString() + " accepted.");
+            DataInputStream in = new DataInputStream(new DataInputStream(socket.getInputStream()));
+            DataOutputStream out = new DataOutputStream(new DataOutputStream(socket.getOutputStream()));
+            ServerCryptography sc = new ServerCryptography();
+            sc.generateAsymmetricKeyPair();
+            byte[] publicKey = sc.getPublicKeyAsByteArray();
+            out.writeInt(publicKey.length);
+            out.write(publicKey);
+            out.flush();
+            while (true) {
+                int length = in.readInt();                    // read length of incoming message
+                byte[] encryptedInput = new byte[0];
+                if (length > 0) {
+                    encryptedInput = new byte[length];
+                    in.readFully(encryptedInput, 0, encryptedInput.length); // read the message
+                }
+                //Read from client: byte[] encryptedMsg
+                String intialMsg = sc.processInitialMsg(encryptedInput);
 
+                if (intialMsg.equals("bye")) {
+                    break;
+                }
+                System.out.println("Server received: " + intialMsg);
+                byte[] encryptedOutput = sc.symmetricEncryption("Hi");
+                out.writeInt(encryptedOutput.length);
+                out.write(encryptedOutput);
+                out.flush();
+            }
+            System.out.println("Closed socket for client " + socket.toString());
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

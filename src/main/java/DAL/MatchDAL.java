@@ -7,7 +7,6 @@ package DAL;
 
 
 import Model.Match;
-import Model.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +23,7 @@ public class MatchDAL extends DatabaseConnection{
     }
     public int addMatch(Match mt) throws SQLException {
         String query = "INSERT INTO matches (MatchId , RoomId , IdPlayer1 , IdPlayer2) VALUES (?, ?, ?, ?)";
-        PreparedStatement p = MatchDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1,mt.getMatchId());
         p.setInt(2,mt.getRoomId());
         p.setInt(3,mt.getIdPlayer1());
@@ -35,7 +34,7 @@ public class MatchDAL extends DatabaseConnection{
 
     public ArrayList loadMatch() throws SQLException {
         String query = "SELECT * FROM matches";
-        PreparedStatement p = MatchDAL.getConnection().prepareStatement(query);
+        PreparedStatement p = this.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
         ArrayList<Match> matchList = new ArrayList<>();
         if (rs != null) {
