@@ -95,7 +95,7 @@ public class UserDAL extends DatabaseConnection {
     }
     
     public Boolean verifyUser(User us) throws SQLException{
-        String query = "SELECT * FROM user WHERE username = ? AND password = ? AND isBlocked = 1";
+        String query = "SELECT * FROM user WHERE username = ? AND password = ? AND isBlocked = 'flase'";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, us.getUserName());
         p.setString(2, us.getPassword());
@@ -103,4 +103,12 @@ public class UserDAL extends DatabaseConnection {
         return rs.next();
     }
 
+    public static void main(String[] args) throws SQLException {
+        UserDAL dal = new UserDAL();
+        User us = new User();
+        us.setUserName("Admin");
+        us.setPassword("e3afed0047b08059d0fada10f400c1e5");
+        if(dal.verifyUser(us)) System.out.println("True");
+        else System.out.println("False");
+    }
 }

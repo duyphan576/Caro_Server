@@ -5,10 +5,13 @@
 package Controller;
 
 import Crypto.ServerCryptography;
+import DAL.UserDAL;
+import Model.User;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,10 +25,25 @@ public class ServerThread implements Runnable {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private User user;
+    private UserDAL userDAL;
     ServerCryptography sc;
 
     public ServerThread(Socket s) {
         this.socket = s;
+    }
+
+    @Override
+    public void run() {
+        try {
+            start();
+            process();
+            stop();
+        } catch (IOException ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void start() throws IOException, NoSuchAlgorithmException {
@@ -55,14 +73,12 @@ public class ServerThread implements Runnable {
             }
             //Read from client: byte[] encryptedMsg
             String intialMsg = sc.processInitialMsg(encryptedInput);
-
+            String[] part = intialMsg.split(";");
             if (intialMsg.equals("bye")) {
                 break;
             }
             System.out.println("Server received: " + intialMsg + " from client " + socket.getPort());
-            byte[] encryptedOutput = sc.symmetricEncryption("Hi");
-            // Write to client: byte[] encryptedOutput
-            push(encryptedOutput);
+            login(part);
         }
     }
 
@@ -80,16 +96,38 @@ public class ServerThread implements Runnable {
         out.flush();
     }
 
-    @Override
-    public void run() {
+    public String convertByteToHex(byte[] data) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < data.length; i++) {
+            sb.append(Integer.toString((data[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return sb.toString();
+    }
+
+    public String getMD5(String input) {
         try {
-            start();
-            process();
-            stop();
-        } catch (IOException ex) {
-            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Exception ex) {
-            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(input.getBytes());
+            return convertByteToHex(messageDigest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void login(String[] part) throws IOException, Exception {
+        user = new User();
+        user.setUserName(part[1].trim());
+        user.setPassword(getMD5(part[2].trim()));
+        userDAL = new UserDAL();
+        
+        if (userDAL.verifyUser(user)) {
+            byte[] encryptedOutput = sc.symmetricEncryption("Success");
+            // Write to client: byte[] encryptedOutput
+            push(encryptedOutput);
+        } else {
+            byte[] encryptedOutput = sc.symmetricEncryption("Fail");
+            // Write to client: byte[] encryptedOutput
+            push(encryptedOutput);
         }
     }
 }
