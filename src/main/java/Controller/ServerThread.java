@@ -119,8 +119,8 @@ public class ServerThread implements Runnable {
         user.setUserName(part[1].trim());
         user.setPassword(getMD5(part[2].trim()));
         userDAL = new UserDAL();
-        
-        if (userDAL.verifyUser(user)) {
+        User us = userDAL.verifyUser(user);
+        if (us.getUserId()!=0) {
             byte[] encryptedOutput = sc.symmetricEncryption("Success");
             // Write to client: byte[] encryptedOutput
             push(encryptedOutput);

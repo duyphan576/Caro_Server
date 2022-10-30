@@ -94,13 +94,25 @@ public class UserDAL extends DatabaseConnection {
         return rs.next();    
     }
     
-    public Boolean verifyUser(User us) throws SQLException{
+    public User verifyUser(User user) throws SQLException{
         String query = "SELECT * FROM user WHERE username = ? AND password = ? AND isBlocked = 'flase'";
         PreparedStatement p = this.getConnection().prepareStatement(query);
-        p.setString(1, us.getUserName());
-        p.setString(2, us.getPassword());
+        p.setString(1, user.getUserName());
+        p.setString(2, user.getPassword());
         ResultSet rs = p.executeQuery();
-        return rs.next();
+        User us = new User();
+        if (rs != null) {
+            while (rs.next()) {
+                us.setUserId(rs.getInt("UserId"));
+                us.setUserName(rs.getString("Username"));
+                us.setPassword(rs.getString("Password"));
+                us.setNickname(rs.getString("Nickname"));
+                us.setSex(rs.getInt("Sex"));
+                us.setBirthday(rs.getDate("Birthday"));
+                us.setIsBlocked(rs.getInt("isBlocked"));
+            }
+        }
+        return us;
     }
 
     public static void main(String[] args) throws SQLException {
@@ -108,7 +120,9 @@ public class UserDAL extends DatabaseConnection {
         User us = new User();
         us.setUserName("Admin");
         us.setPassword("e3afed0047b08059d0fada10f400c1e5");
-        if(dal.verifyUser(us)) System.out.println("True");
+        User user = dal.verifyUser(us);
+        System.out.println(user.getUserName());
+        if(user.getUserId()!=0) System.out.println("True");
         else System.out.println("False");
     }
 }
