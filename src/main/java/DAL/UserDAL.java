@@ -22,7 +22,7 @@ public class UserDAL extends DatabaseConnection {
     }
 
     public int addUser(User us) throws SQLException {
-        String query = "INSERT INTO user (Username, Password, Nickname, Sex, Birthday, isBlocked) VALUES (?, ?, ?, ?, ?, 1)";
+        String query = "INSERT INTO user (Username, Password, Nickname, Sex, Birthday, isBlocked, Avatar) VALUES (?, ?, ?, ?, ?, 1, ?)";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, us.getUserName());
         p.setString(2, us.getPassword());

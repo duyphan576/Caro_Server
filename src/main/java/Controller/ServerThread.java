@@ -17,7 +17,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -84,6 +86,17 @@ public class ServerThread implements Runnable {
             if (intialMsg.equals("bye")) {
                 break;
             }
+            else if(part[0].equals("Register")){
+            user = new User();
+            user.setUserName(part[1]);
+            user.setPassword(part[2]);
+            user.setNickname(part[3]);
+            user.setSex(Integer.parseInt(part[4]));
+            Date date = (Date) new SimpleDateFormat("dd/MM/YYY").parse(part[5]);
+            user.setBirthday(date);
+            user.setAvatar(part[6]);
+            userDAL.addUser(user);
+        }
             System.out.println("Server received: " + intialMsg + " from client " + socket.getPort());
             
         }

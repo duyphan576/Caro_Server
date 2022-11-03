@@ -12,7 +12,15 @@ import java.sql.Date;
  */
 public class User {
     int userId, sex, isBlocked;
-    String userName, password, nickname;
+    String userName, password, nickname,avatar;
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
     Date birthday;
 
     public User(){
