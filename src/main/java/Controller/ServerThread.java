@@ -5,14 +5,21 @@
 package Controller;
 
 import Crypto.ServerCryptography;
+import DAL.GradeDAL;
 import DAL.UserDAL;
+import Model.Grade;
 import Model.User;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,7 +85,7 @@ public class ServerThread implements Runnable {
                 break;
             }
             System.out.println("Server received: " + intialMsg + " from client " + socket.getPort());
-            login(part);
+            
         }
     }
 
@@ -120,7 +127,7 @@ public class ServerThread implements Runnable {
         user.setPassword(getMD5(part[2].trim()));
         userDAL = new UserDAL();
         User us = userDAL.verifyUser(user);
-        if (us.getUserId()!=0) {
+        if (us.getUserId() != 0) {
             byte[] encryptedOutput = sc.symmetricEncryption("Success");
             // Write to client: byte[] encryptedOutput
             push(encryptedOutput);
@@ -128,6 +135,30 @@ public class ServerThread implements Runnable {
             byte[] encryptedOutput = sc.symmetricEncryption("Fail");
             // Write to client: byte[] encryptedOutput
             push(encryptedOutput);
+        }
+    }
+
+    public static byte[] object2Byte(Object obj) {
+
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ObjectOutputStream dout = null;
+        try {
+            dout = new ObjectOutputStream(bout);
+            dout.writeObject(obj);
+            dout.close();
+        } catch (IOException e) {
+            System.out.println("Unable to object to bytes");
+        }
+        return bout.toByteArray();
+    }
+    
+    public static void main(String[] args) throws SQLException {
+        GradeDAL g = new GradeDAL();
+        List list = g.getRank();
+        for(int i = 0; i< list.size(); i++){
+            Grade grd = (Grade) list.get(i);
+            byte[] ob = object2Byte(grd);
+            System.out.println(ob.toString());
         }
     }
 }

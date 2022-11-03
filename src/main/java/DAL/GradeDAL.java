@@ -8,6 +8,7 @@ import Model.Grade;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -154,22 +155,23 @@ public class GradeDAL extends DatabaseConnection {
         return rs;
     }
     
-    public int getRank(int id) throws SQLException{
-        int rank = 1;
+    public ArrayList getRank() throws SQLException{
         String query = "SELECT UserId, Grade from grade ORDER BY Grade DESC";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
+        ArrayList<Grade> gradeList = new ArrayList<>();
         if(rs!=null){
             while(rs.next()){
-                if(rs.getInt("UserId")==id) return rank;
-                rank++;
+                Grade grade = new Grade();
+                grade.setUserId(rs.getInt("UserID"));
+                grade.setGrade(rs.getInt("Grade"));
+                gradeList.add(grade);
             }
         }
-        return -1;
+        return gradeList;
     }
     
     public static void main(String[] args) throws SQLException {
         GradeDAL g = new GradeDAL();
-        System.out.println(g.getRank(2));
     }
 }
