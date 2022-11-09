@@ -5,10 +5,15 @@
 package DAL;
 
 import Model.Grade;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -145,7 +150,7 @@ public class GradeDAL extends DatabaseConnection {
         return 0;
     }
 
-    public int updateDrawMatch(int id) throws SQLException{
+    public int updateDrawMatch(int id) throws SQLException {
         Grade gr = getGrade(id);
         String query = "UPDATE grade SET `DrawMatch` = ?, `CurrentWinStreak` = 0, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
@@ -155,14 +160,20 @@ public class GradeDAL extends DatabaseConnection {
         int rs = p.executeUpdate();
         return rs;
     }
+<<<<<<< Updated upstream
     
     public ArrayList getRank() throws SQLException{
         String query = "SELECT * from grade ORDER BY Grade DESC";
+=======
+
+    public ArrayList getRank() throws SQLException {
+        String query = "SELECT UserId, Grade from grade ORDER BY Grade DESC";
+>>>>>>> Stashed changes
         PreparedStatement p = this.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
         ArrayList<Grade> gradeList = new ArrayList<>();
-        if(rs!=null){
-            while(rs.next()){
+        if (rs != null) {
+            while (rs.next()) {
                 Grade grade = new Grade();
                 grade.setUserId(rs.getInt("UserID"));
                 grade.setGrade(rs.getInt("Grade"));
@@ -178,8 +189,16 @@ public class GradeDAL extends DatabaseConnection {
         }
         return gradeList;
     }
-    
-    public static void main(String[] args) throws SQLException {
+
+
+
+    public static void main(String[] args) throws SQLException, IOException {
         GradeDAL g = new GradeDAL();
+        List list = g.getRank();
+        for(int i=0;i<list.size();i++){
+            Grade gr = (Grade) list.get(i);
+            System.out.println(gr.getUserId());
+            
+        }
     }
 }

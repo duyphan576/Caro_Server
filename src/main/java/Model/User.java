@@ -22,6 +22,7 @@ public class User {
         this.avatar = avatar;
     }
     Date birthday;
+    
 
     public User(){
         

@@ -17,10 +17,16 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.sql.SQLException;
+<<<<<<< Updated upstream
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+=======
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+>>>>>>> Stashed changes
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +42,10 @@ public class ServerThread implements Runnable {
     private DataOutputStream out;
     private User user;
     private UserDAL userDAL;
-    ServerCryptography sc;
+    private Grade grade;
+    private GradeDAL gradeDAL;
+    private ServerCryptography sc;
+    private String name;
 
     public ServerThread(Socket s) {
         this.socket = s;
@@ -86,6 +95,7 @@ public class ServerThread implements Runnable {
             if (intialMsg.equals("bye")) {
                 break;
             } else if (part[0].equals("Register")) {
+<<<<<<< Updated upstream
                 user = new User();
                 UserDAL userdal = new UserDAL();
                 user.setUserName(part[1]);
@@ -112,6 +122,11 @@ public class ServerThread implements Runnable {
                 }
                 byte[] encryptedOutput = sc.symmetricEncryption(msg);
                 push(encryptedOutput);
+=======
+                register(part);
+            } else if (part[0].equals("Login")) {
+                login(part);
+>>>>>>> Stashed changes
             }
             System.out.println("Server received: " + intialMsg + " from client " + socket.getPort());
 
@@ -156,8 +171,14 @@ public class ServerThread implements Runnable {
         user.setPassword(getMD5(part[2].trim()));
         userDAL = new UserDAL();
         User us = userDAL.verifyUser(user);
+        name = us.getNickname();
+        Grade gr = gradeDAL.getGrade(us.getUserId());
+        String msg = "Success;" + String.valueOf(us.getUserId()) + ";" + us.getUserName() + ";" + us.getPassword() + ";" + us.getNickname() + ";" + String.valueOf(us.getSex()) + ";" + us.getBirthday().toString()
+                + ";" + String.valueOf(gr.getUserId()) + ";" + String.valueOf(gr.getGrade()) + ";" + String.valueOf(gr.getWinMatch()) + ";" + String.valueOf(gr.getLoseMatch()) + ";" + String.valueOf(gr.getDrawMatch())
+                + ";" + String.valueOf(gr.getCurrentWinStreak()) + ";" + String.valueOf(gr.getMaxWinStreak())
+                + ";" + String.valueOf(gr.getCurrentLoseStreak()) + ";" + String.valueOf(gr.getMaxLoseStreak()) + ";" + Float.toString(gradeDAL.getWinRate(gr.getUserId()));
         if (us.getUserId() != 0) {
-            byte[] encryptedOutput = sc.symmetricEncryption("Success");
+            byte[] encryptedOutput = sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput
             push(encryptedOutput);
         } else {
@@ -167,6 +188,7 @@ public class ServerThread implements Runnable {
         }
     }
 
+<<<<<<< Updated upstream
     public static byte[] object2Byte(Object obj) {
 
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -189,5 +211,16 @@ public class ServerThread implements Runnable {
             byte[] ob = object2Byte(grd);
             System.out.println(ob.toString());
         }
+=======
+    public void register(String[] part) throws SQLException, ParseException {
+        user = new User();
+        user.setUserName(part[1]);
+        user.setPassword(part[2]);
+        user.setNickname(part[3]);
+        user.setSex(Integer.parseInt(part[4]));
+        Date date = (Date) new SimpleDateFormat("dd/MM/YYY").parse(part[5]);
+        user.setBirthday(date);
+        userDAL.addUser(user);
+>>>>>>> Stashed changes
     }
 }
