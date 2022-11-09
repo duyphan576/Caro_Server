@@ -17,10 +17,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,20 +85,36 @@ public class ServerThread implements Runnable {
             String[] part = intialMsg.split(";");
             if (intialMsg.equals("bye")) {
                 break;
+            } else if (part[0].equals("Register")) {
+                user = new User();
+                UserDAL userdal = new UserDAL();
+                user.setUserName(part[1]);
+                user.setPassword(part[2]);
+                user.setNickname(part[3]);
+                user.setSex(Integer.parseInt(part[4]));
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                Date parsed = format.parse(part[5]);
+                java.sql.Date sql = new java.sql.Date(parsed.getTime());
+                user.setBirthday(sql);
+                userdal.addUser(user);
+            } else if (part[0].equals("Rank")) {
+                GradeDAL gradeDAL = new GradeDAL();
+                List list = gradeDAL.getRank();
+                String msg = "Rank";
+                if (!list.isEmpty()) {
+                    for (int i = 0; i < list.size(); i++) {
+                        Grade grd = (Grade) list.get(i);
+                        msg += ";" + String.valueOf(grd.getUserId()) + ";" + String.valueOf(grd.getGrade())+ ";" + String.valueOf(grd.getWinMatch())+ ";" 
+                                + String.valueOf(grd.getLoseMatch())+ ";" + String.valueOf(grd.getDrawMatch())
+                                + ";" + String.valueOf(grd.getCurrentWinStreak())+ ";" + String.valueOf(grd.getCurrentLoseStreak())+ ";" 
+                                + String.valueOf(grd.getMaxWinStreak())+ ";" +String.valueOf(grd.getMaxLoseStreak())+";"+Float.toString(gradeDAL.getWinRate(grd.getUserId()));
+                    }
+                }
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
             }
-            else if(part[0].equals("Register")){
-            user = new User();
-            user.setUserName(part[1]);
-            user.setPassword(part[2]);
-            user.setNickname(part[3]);
-            user.setSex(Integer.parseInt(part[4]));
-            Date date = (Date) new SimpleDateFormat("dd/MM/YYY").parse(part[5]);
-            user.setBirthday(date);
-            user.setAvatar(part[6]);
-            userDAL.addUser(user);
-        }
             System.out.println("Server received: " + intialMsg + " from client " + socket.getPort());
-            
+
         }
     }
 
@@ -164,11 +180,11 @@ public class ServerThread implements Runnable {
         }
         return bout.toByteArray();
     }
-    
+
     public static void main(String[] args) throws SQLException {
         GradeDAL g = new GradeDAL();
         List list = g.getRank();
-        for(int i = 0; i< list.size(); i++){
+        for (int i = 0; i < list.size(); i++) {
             Grade grd = (Grade) list.get(i);
             byte[] ob = object2Byte(grd);
             System.out.println(ob.toString());

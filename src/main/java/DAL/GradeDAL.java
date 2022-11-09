@@ -59,6 +59,7 @@ public class GradeDAL extends DatabaseConnection {
         }
         return gr;
     }
+    
 
     public int getMatch(int id) throws SQLException {
         String query = "SELECT WinMatch, LoseMatch, DrawMatch FROM Grade where UserID=?";
@@ -74,7 +75,7 @@ public class GradeDAL extends DatabaseConnection {
         return all;
     }
 
-    public String getWinRate(int id) throws SQLException {
+    public float getWinRate(int id) throws SQLException {
         String query = "SELECT WinMatch FROM Grade where UserID=?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, id);
@@ -85,7 +86,7 @@ public class GradeDAL extends DatabaseConnection {
                 rate = (float) rs.getInt("WinMatch") / getMatch(id);
             }
         }
-        return (rate * 100) + "%";
+        return (rate * 100);
     }
 
     public int updateWinMatch(int id) throws SQLException {
@@ -156,7 +157,7 @@ public class GradeDAL extends DatabaseConnection {
     }
     
     public ArrayList getRank() throws SQLException{
-        String query = "SELECT UserId, Grade from grade ORDER BY Grade DESC";
+        String query = "SELECT * from grade ORDER BY Grade DESC";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
         ArrayList<Grade> gradeList = new ArrayList<>();
@@ -165,6 +166,13 @@ public class GradeDAL extends DatabaseConnection {
                 Grade grade = new Grade();
                 grade.setUserId(rs.getInt("UserID"));
                 grade.setGrade(rs.getInt("Grade"));
+                grade.setWinMatch(rs.getInt("WinMatch"));
+                grade.setLoseMatch(rs.getInt("LoseMatch"));
+                grade.setDrawMatch(rs.getInt("DrawMatch"));
+                grade.setCurrentWinStreak(rs.getInt("CurrentWinStreak"));
+                grade.setMaxWinStreak(rs.getInt("MaxWinStreak"));
+                grade.setCurrentLoseStreak(rs.getInt("CurrentLoseStreak"));
+                grade.setMaxLoseStreak(rs.getInt("MaxLoseStreak"));
                 gradeList.add(grade);
             }
         }
