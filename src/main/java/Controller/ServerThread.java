@@ -53,7 +53,7 @@ public class ServerThread implements Runnable {
         }
     }
 
-    public void start() throws IOException, NoSuchAlgorithmException {
+    public void start() throws IOException, NoSuchAlgorithmException, Exception {
         System.out.println("Client " + socket.toString() + " accepted.");
         in = new DataInputStream(new DataInputStream(socket.getInputStream()));
         out = new DataOutputStream(new DataOutputStream(socket.getOutputStream()));
@@ -65,6 +65,14 @@ public class ServerThread implements Runnable {
         out.writeInt(publicKey.length);
         out.write(publicKey);
         out.flush();
+        int length = in.readInt();
+        byte[] encryptedInput = new byte[0];
+        if (length > 0) {
+            encryptedInput = new byte[length];
+            // read the message
+            in.readFully(encryptedInput, 0, encryptedInput.length);
+        }
+        String input = sc.processInitialMsg(encryptedInput);
     }
 
     public void process() throws IOException, Exception {
@@ -79,7 +87,7 @@ public class ServerThread implements Runnable {
                 in.readFully(encryptedInput, 0, encryptedInput.length);
             }
             //Read from client: byte[] encryptedMsg
-            String intialMsg = sc.processInitialMsg(encryptedInput);
+            String intialMsg = sc.symmetricDecryption(encryptedInput);
             String[] part = intialMsg.split(";");
             if (intialMsg.equals("bye")) {
                 break;
@@ -104,9 +112,9 @@ public class ServerThread implements Runnable {
                 login(part);
             } else if (part[0].equals("FriendOnl")) {
                 List<User> l = userDAL.findUserOnl();
-                String tempp=String.valueOf(l.size());
+                String tempp = String.valueOf(l.size());
                 for (User use : l) {
-                    tempp += ";"+use.getNickname() + ";" + String.valueOf(use.getStatus());
+                    tempp += ";" + use.getNickname() + ";" + String.valueOf(use.getStatus());
                 }
                 byte[] encryptedOutput = sc.symmetricEncryption(tempp);
                 push(encryptedOutput);
