@@ -7,6 +7,7 @@ package Controller;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,23 +19,24 @@ public class Server {
 
     public static int port = 1234;
     private static ServerSocket server;
+    public static Vector<ServerThread> clientList = new Vector<>();
+    
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         ExecutorService executor = Executors.newCachedThreadPool();
         try {
-            server = new ServerSocket(port);
-            System.out.println("Server blinding at port " + port);
+            ServerSocket server = new ServerSocket(port);
+            System.out.println("Server binding at port " + port);
             System.out.println("Waiting for client...");
-            while (true) {
+            int i =1;
+            while(true) {
                 Socket socket = server.accept();
-                executor.execute(new ServerThread(socket));
+                ServerThread client = new ServerThread(socket, Integer.toString(i++));
+                clientList.add(client);
+                executor.execute(client);
             }
         } catch (IOException e) {
             System.out.println(e);
-        } finally {
-            if (server != null) {
-                server.close();
-            }
         }
     }
 

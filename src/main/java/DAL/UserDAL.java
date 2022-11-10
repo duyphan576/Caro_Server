@@ -29,7 +29,7 @@ public class UserDAL extends DatabaseConnection {
     }
 
     public int addUser(User us) throws SQLException {
-        String query = "INSERT INTO user (Username, Password, Nickname, Sex, Birthday, isBlocked) VALUES (?, ?, ?, ?, ?, 1)";
+        String query = "INSERT INTO user (Username, Password, Nickname, Sex, Birthday) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, us.getUserName());
         p.setString(2, us.getPassword());
@@ -41,7 +41,7 @@ public class UserDAL extends DatabaseConnection {
     }
 
     public int updateUser(User us) throws SQLException {
-        String query = "UPDATE user SET Password = ?, Nickname = ?, Sex = ?, Birthday = ?, isBlocked = ? WHERE UserId = ?";
+        String query = "UPDATE user SET Password = ?, Nickname = ?, Sex = ?, Birthday = ? WHERE UserId = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, us.getPassword());
         p.setString(2, us.getNickname());
@@ -66,6 +66,14 @@ public class UserDAL extends DatabaseConnection {
                 us.setNickname(rs.getString("Nickname"));
                 us.setSex(rs.getInt("Sex"));
                 us.setBirthday(rs.getDate("Birthday"));
+                us.setGrade(rs.getInt("Grade"));
+                us.setWinMatch(rs.getInt("WinMatch"));
+                us.setLoseMatch(rs.getInt("LoseMatch"));
+                us.setDrawMatch(rs.getInt("DrawMatch"));
+                us.setCurrentWinStreak(rs.getInt("CurrentWinStreak"));
+                us.setMaxWinStreak(rs.getInt("MaxWinStreak"));
+                us.setCurrentLoseStreak(rs.getInt("CurrentLoseStreak"));
+                us.setMaxLoseStreak(rs.getInt("MaxLoseStreak"));
                 us.setIsBlocked(rs.getInt("isBlocked"));
                 userList.add(us);
             }
@@ -87,13 +95,21 @@ public class UserDAL extends DatabaseConnection {
                 us.setNickname(rs.getString("Nickname"));
                 us.setSex(rs.getInt("Sex"));
                 us.setBirthday(rs.getDate("Birthday"));
+                us.setGrade(rs.getInt("Grade"));
+                us.setWinMatch(rs.getInt("WinMatch"));
+                us.setLoseMatch(rs.getInt("LoseMatch"));
+                us.setDrawMatch(rs.getInt("DrawMatch"));
+                us.setCurrentWinStreak(rs.getInt("CurrentWinStreak"));
+                us.setMaxWinStreak(rs.getInt("MaxWinStreak"));
+                us.setCurrentLoseStreak(rs.getInt("CurrentLoseStreak"));
+                us.setMaxLoseStreak(rs.getInt("MaxLoseStreak"));
                 us.setIsBlocked(rs.getInt("isBlocked"));
             }
         }
         return us;
     }
 
-    public ArrayList findUserOnl() throws SQLException {
+    public ArrayList findUserOnline() throws SQLException {
         String sql = "Select UserId,Nickname,Status From user ";
         ArrayList<User> list = new ArrayList();
         PreparedStatement p = this.getConnection().prepareStatement(sql);
@@ -133,6 +149,14 @@ public class UserDAL extends DatabaseConnection {
                 us.setNickname(rs.getString("Nickname"));
                 us.setSex(rs.getInt("Sex"));
                 us.setBirthday(rs.getDate("Birthday"));
+                us.setGrade(rs.getInt("Grade"));
+                us.setWinMatch(rs.getInt("WinMatch"));
+                us.setLoseMatch(rs.getInt("LoseMatch"));
+                us.setDrawMatch(rs.getInt("DrawMatch"));
+                us.setCurrentWinStreak(rs.getInt("CurrentWinStreak"));
+                us.setMaxWinStreak(rs.getInt("MaxWinStreak"));
+                us.setCurrentLoseStreak(rs.getInt("CurrentLoseStreak"));
+                us.setMaxLoseStreak(rs.getInt("MaxLoseStreak"));
                 us.setIsBlocked(rs.getInt("isBlocked"));
             }
         }
@@ -279,4 +303,12 @@ public class UserDAL extends DatabaseConnection {
         return gradeList;
     }
 
+    public int setOnlOff(int id, int status) throws SQLException{
+        String query = "UPDATE user SET Status = ? Where UserID = ?";
+        PreparedStatement p = this.getConnection().prepareStatement(query);
+        p.setInt(1, status);
+        p.setInt(2, id);
+        int rs = p.executeUpdate();
+        return rs;
+    }
 }
