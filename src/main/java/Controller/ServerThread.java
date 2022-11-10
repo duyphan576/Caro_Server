@@ -5,28 +5,19 @@
 package Controller;
 
 import Crypto.ServerCryptography;
-import DAL.GradeDAL;
 import DAL.UserDAL;
-import Model.Grade;
 import Model.User;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Date;
+
 import java.sql.SQLException;
-<<<<<<< Updated upstream
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-=======
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
->>>>>>> Stashed changes
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,8 +33,6 @@ public class ServerThread implements Runnable {
     private DataOutputStream out;
     private User user;
     private UserDAL userDAL;
-    private Grade grade;
-    private GradeDAL gradeDAL;
     private ServerCryptography sc;
     private String name;
 
@@ -95,38 +84,32 @@ public class ServerThread implements Runnable {
             if (intialMsg.equals("bye")) {
                 break;
             } else if (part[0].equals("Register")) {
-<<<<<<< Updated upstream
-                user = new User();
-                UserDAL userdal = new UserDAL();
-                user.setUserName(part[1]);
-                user.setPassword(part[2]);
-                user.setNickname(part[3]);
-                user.setSex(Integer.parseInt(part[4]));
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                Date parsed = format.parse(part[5]);
-                java.sql.Date sql = new java.sql.Date(parsed.getTime());
-                user.setBirthday(sql);
-                userdal.addUser(user);
+                register(part);
             } else if (part[0].equals("Rank")) {
-                GradeDAL gradeDAL = new GradeDAL();
+                UserDAL gradeDAL = new UserDAL();
                 List list = gradeDAL.getRank();
                 String msg = "Rank";
                 if (!list.isEmpty()) {
                     for (int i = 0; i < list.size(); i++) {
-                        Grade grd = (Grade) list.get(i);
-                        msg += ";" + String.valueOf(grd.getUserId()) + ";" + String.valueOf(grd.getGrade())+ ";" + String.valueOf(grd.getWinMatch())+ ";" 
-                                + String.valueOf(grd.getLoseMatch())+ ";" + String.valueOf(grd.getDrawMatch())
-                                + ";" + String.valueOf(grd.getCurrentWinStreak())+ ";" + String.valueOf(grd.getCurrentLoseStreak())+ ";" 
-                                + String.valueOf(grd.getMaxWinStreak())+ ";" +String.valueOf(grd.getMaxLoseStreak())+";"+Float.toString(gradeDAL.getWinRate(grd.getUserId()));
+                        User grd = (User) list.get(i);
+                        msg += ";" + String.valueOf(grd.getUserId()) + ";" + String.valueOf(grd.getGrade()) + ";" + String.valueOf(grd.getWinMatch()) + ";"
+                                + String.valueOf(grd.getLoseMatch()) + ";" + String.valueOf(grd.getDrawMatch())
+                                + ";" + String.valueOf(grd.getCurrentWinStreak()) + ";" + String.valueOf(grd.getCurrentLoseStreak()) + ";"
+                                + String.valueOf(grd.getMaxWinStreak()) + ";" + String.valueOf(grd.getMaxLoseStreak()) + ";" + Float.toString(gradeDAL.getWinRate(grd.getUserId()));
                     }
                 }
                 byte[] encryptedOutput = sc.symmetricEncryption(msg);
                 push(encryptedOutput);
-=======
-                register(part);
             } else if (part[0].equals("Login")) {
                 login(part);
->>>>>>> Stashed changes
+            } else if (part[0].equals("FriendOnl")) {
+                List<User> l = userDAL.findUserOnl();
+                String tempp=String.valueOf(l.size());
+                for (User use : l) {
+                    tempp += ";"+use.getNickname() + ";" + String.valueOf(use.getStatus());
+                }
+                byte[] encryptedOutput = sc.symmetricEncryption(tempp);
+                push(encryptedOutput);
             }
             System.out.println("Server received: " + intialMsg + " from client " + socket.getPort());
 
@@ -172,11 +155,11 @@ public class ServerThread implements Runnable {
         userDAL = new UserDAL();
         User us = userDAL.verifyUser(user);
         name = us.getNickname();
-        Grade gr = gradeDAL.getGrade(us.getUserId());
+        User gr = userDAL.getGrade(us.getUserId());
         String msg = "Success;" + String.valueOf(us.getUserId()) + ";" + us.getUserName() + ";" + us.getPassword() + ";" + us.getNickname() + ";" + String.valueOf(us.getSex()) + ";" + us.getBirthday().toString()
                 + ";" + String.valueOf(gr.getUserId()) + ";" + String.valueOf(gr.getGrade()) + ";" + String.valueOf(gr.getWinMatch()) + ";" + String.valueOf(gr.getLoseMatch()) + ";" + String.valueOf(gr.getDrawMatch())
                 + ";" + String.valueOf(gr.getCurrentWinStreak()) + ";" + String.valueOf(gr.getMaxWinStreak())
-                + ";" + String.valueOf(gr.getCurrentLoseStreak()) + ";" + String.valueOf(gr.getMaxLoseStreak()) + ";" + Float.toString(gradeDAL.getWinRate(gr.getUserId()));
+                + ";" + String.valueOf(gr.getCurrentLoseStreak()) + ";" + String.valueOf(gr.getMaxLoseStreak()) + ";" + Float.toString(userDAL.getWinRate(gr.getUserId()));
         if (us.getUserId() != 0) {
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput
@@ -188,39 +171,17 @@ public class ServerThread implements Runnable {
         }
     }
 
-<<<<<<< Updated upstream
-    public static byte[] object2Byte(Object obj) {
-
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ObjectOutputStream dout = null;
-        try {
-            dout = new ObjectOutputStream(bout);
-            dout.writeObject(obj);
-            dout.close();
-        } catch (IOException e) {
-            System.out.println("Unable to object to bytes");
-        }
-        return bout.toByteArray();
-    }
-
-    public static void main(String[] args) throws SQLException {
-        GradeDAL g = new GradeDAL();
-        List list = g.getRank();
-        for (int i = 0; i < list.size(); i++) {
-            Grade grd = (Grade) list.get(i);
-            byte[] ob = object2Byte(grd);
-            System.out.println(ob.toString());
-        }
-=======
     public void register(String[] part) throws SQLException, ParseException {
         user = new User();
+        UserDAL userdal = new UserDAL();
         user.setUserName(part[1]);
-        user.setPassword(part[2]);
+        user.setPassword(getMD5(part[2].trim()));
         user.setNickname(part[3]);
         user.setSex(Integer.parseInt(part[4]));
-        Date date = (Date) new SimpleDateFormat("dd/MM/YYY").parse(part[5]);
-        user.setBirthday(date);
-        userDAL.addUser(user);
->>>>>>> Stashed changes
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date parsed = format.parse(part[5]);
+        java.sql.Date sql = new java.sql.Date(parsed.getTime());
+        user.setBirthday(sql);
+        userdal.addUser(user);
     }
 }
