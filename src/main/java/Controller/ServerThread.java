@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  * @author duyph
  */
 public class ServerThread implements Runnable {
-    
+
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
@@ -34,7 +34,7 @@ public class ServerThread implements Runnable {
     private UserDAL userDAL;
     private ServerCryptography sc;
     private String name;
-    
+
     public ServerThread(Socket s, String n) throws IOException {
         this.socket = s;
         this.name = n;
@@ -42,12 +42,12 @@ public class ServerThread implements Runnable {
         out = new DataOutputStream(new DataOutputStream(socket.getOutputStream()));
         sc = new ServerCryptography();
     }
-    
+
     @Override
     public void run() {
         try {
             System.out.println("Client " + socket.toString() + " accepted");
-            
+
             String encryptedMsg = null;
             sc.generateAsymmetricKeyPair();
             byte[] key = sc.getPublicKeyAsByteArray();
@@ -105,13 +105,13 @@ public class ServerThread implements Runnable {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void push(byte[] msg) throws IOException {
         out.writeInt(msg.length);
         out.write(msg);
         out.flush();
     }
-    
+
     public String convertByteToHex(byte[] data) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < data.length; i++) {
@@ -119,7 +119,7 @@ public class ServerThread implements Runnable {
         }
         return sb.toString();
     }
-    
+
     public String getMD5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -129,7 +129,7 @@ public class ServerThread implements Runnable {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void login(String[] part) throws IOException, Exception {
         user = new User();
         user.setUserName(part[1].trim());
@@ -152,8 +152,8 @@ public class ServerThread implements Runnable {
             push(encryptedOutput);
         }
     }
-    
-    public void register(String[] part) throws SQLException, ParseException {
+
+    public void register(String[] part) throws SQLException, ParseException, IOException, Exception {
         user = new User();
         UserDAL userdal = new UserDAL();
         user.setUserName(part[1]);
@@ -164,9 +164,18 @@ public class ServerThread implements Runnable {
         Date parsed = format.parse(part[5]);
         java.sql.Date sql = new java.sql.Date(parsed.getTime());
         user.setBirthday(sql);
-        userdal.addUser(user);
+        if (userdal.addUser(user) != 0) {
+            String msg = "Success;";
+            byte[] encryptedOutput = sc.symmetricEncryption(msg);
+            push(encryptedOutput);
+        } else {
+            byte[] encryptedOutput = sc.symmetricEncryption("Fail");
+            // Write to client: byte[] encryptedOutput
+            push(encryptedOutput);
+        }
+
     }
-    
+
     public void rank(String[] part) {
         try {
             UserDAL gradeDAL = new UserDAL();
