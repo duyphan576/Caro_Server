@@ -91,6 +91,14 @@ public class ServerThread implements Runnable {
                     }
                     byte[] encryptedOutput = sc.symmetricEncryption(tempp);
                     push(encryptedOutput);
+                } else if (part[0].equals("Chathomepage")){
+                    byte[] encryptedOutput = sc.symmetricEncryption(encryptedMsg);
+                    for (ServerThread client : Server.clientList) {
+                         if (!name.equals(client.name)) {
+                        client.push(encryptedOutput);
+                        System.out.println("Server sent '" + encryptedOutput + "' from Client " + name + "--> Client " + client.name);
+                        }
+                    }
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
