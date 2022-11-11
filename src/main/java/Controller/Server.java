@@ -18,7 +18,8 @@ import java.util.concurrent.Executors;
 public class Server {
 
     public static int port = 1234;
-    private static ServerSocket server;
+    public static ServerSocket server;
+    public static int roomId;
     public static Vector<ServerThread> clientList = new Vector<>();
     
 
@@ -29,6 +30,7 @@ public class Server {
             System.out.println("Server binding at port " + port);
             System.out.println("Waiting for client...");
             int i =1;
+            roomId = 1000;
             while(true) {
                 Socket socket = server.accept();
                 ServerThread client = new ServerThread(socket, Integer.toString(i++));
