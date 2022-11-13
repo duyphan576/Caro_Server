@@ -112,8 +112,8 @@ public class ServerThread implements Runnable {
                 //Read from client: byte[] encryptedMsg
                 encryptedMsg = sc.symmetricDecryption(encryptedInput);
                 String[] part = encryptedMsg.split(";");
-                if (encryptedMsg.equals("Exit")) {
-
+                if (part[0].equals("Exit")) {
+                    userDAL.setOnlOff(Integer.parseInt(part[1]), 0);
                     break;
                 } else if (part[0].equals("Register")) {
                     register(part);
@@ -127,7 +127,7 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("createRoom")) {
                     createRoom(part);
                 } else if (part[0].equals("Logout")) {
-
+                    userDAL.setOnlOff(Integer.parseInt(part[1]), 0);
                 } else if (part[0].equals("Broadcast")) {
                     broadcast(part);
                 }
