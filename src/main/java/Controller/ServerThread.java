@@ -129,6 +129,15 @@ public class ServerThread implements Runnable {
                     broadcast(part);
                 } else if (part[0].equals("viewListRoom")) {
                     viewListRoom(part);
+                } else if (part[0].equals("caro")) {
+                    byte[] msg = sc.symmetricEncryption(encryptedMsg);
+                    room.getCompetitor(name).push(msg);
+                }else if (part[0].equals("viewListRoom")) {
+                    viewListRoom(part);
+                }else if (part[0].equals("viewListRoom")) {
+                    viewListRoom(part);
+                }else if (part[0].equals("viewListRoom")) {
+                    viewListRoom(part);
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -164,12 +173,32 @@ public class ServerThread implements Runnable {
         }
     }
 
+    public void playNow(String[] part) {
+        boolean isFinded = false;
+        for (ServerThread client : Server.clientList) {
+            if (client.room != null && client.room.getNumberOfUser() == 1 && client.room.getPassword().equals(" ")) {
+                try {
+                    client.room.setUser2(this);
+                    this.room = client.room;
+                    System.out.println("Đã vào phòng " + room.getID());
+                    goToPartnerRoom();
+                    userDAL.setOnlOff(this.user.getUserId(),2);
+                    isFinded = true;
+                    //Xử lý phần mời cả 2 người chơi vào phòng
+                    break;
+                } catch (SQLException ex) {
+                    Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
     public void viewListRoom(String[] part) {
         try {
             String msg = "viewListRoomSuccess;";
             for (ServerThread client : Server.clientList) {
                 if (client.room != null && client.room.getNumberOfUser() == 1) {
-                    msg += client.room.getID() + ";" + client.room.getPassword()+ ";";
+                    msg += client.room.getID() + ";" + client.room.getPassword() + ";";
                 }
             }
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
@@ -326,12 +355,12 @@ public class ServerThread implements Runnable {
 
     public void goToOwnRoom() {
         try {
-            String msg = "Go-to-room;" + room.getID() + ";" + room.getCompetitor(this.getName()).getClientIP() + ";1;"
+            String msg = "goToRoom;" + room.getID() + ";" + room.getCompetitor(this.getName()).getClientIP() + ";1;"
                     + getStringFromUser(room.getCompetitor(this.getName()).getUser());
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput
             push(encryptedOutput);
-            msg = "Go-to-room;" + room.getID() + ";" + this.clientIP + ",0," + getStringFromUser(user);
+            msg = "goToRoom;" + room.getID() + ";" + this.clientIP + ",0," + getStringFromUser(user);
             encryptedOutput = sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput
             room.getCompetitor(this.name).push(encryptedOutput);
@@ -343,12 +372,12 @@ public class ServerThread implements Runnable {
 
     public void goToPartnerRoom() {
         try {
-            String msg = "Go-to-room;" + room.getID() + ";" + room.getCompetitor(this.getName()).getClientIP() + ";0;"
+            String msg = "goToRoom;" + room.getID() + ";" + room.getCompetitor(this.getName()).getClientIP() + ";0;"
                     + getStringFromUser(room.getCompetitor(this.getName()).getUser());
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput
             push(encryptedOutput);
-            msg = "Go-to-room;" + room.getID() + ";" + this.clientIP + ";1;" + getStringFromUser(user);
+            msg = "goToRoom;" + room.getID() + ";" + this.clientIP + ";1;" + getStringFromUser(user);
             encryptedOutput = sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput
             room.getCompetitor(this.name).push(encryptedOutput);
