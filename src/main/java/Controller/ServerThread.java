@@ -78,8 +78,6 @@ public class ServerThread implements Runnable {
     public ServerCryptography getSc() {
         return sc;
     }
-    
-    
 
     @Override
     public void run() {
@@ -120,7 +118,6 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("Rank")) {
                     rank(part);
                 } else if (part[0].equals("Login")) {
-                    System.out.println(encryptedMsg);
                     login(part);
                 } else if (part[0].equals("userStatus")) {
                     userStatus(part);
@@ -130,6 +127,8 @@ public class ServerThread implements Runnable {
 
                 } else if (part[0].equals("Broadcast")) {
                     broadcast(part);
+                } else if (part[0].equals("viewListRoom")) {
+                    viewListRoom(part);
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -162,6 +161,22 @@ public class ServerThread implements Runnable {
             return convertByteToHex(messageDigest);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void viewListRoom(String[] part) {
+        try {
+            String msg = "viewListRoomSuccess;";
+            for (ServerThread client : Server.clientList) {
+                if (client.room != null && client.room.getNumberOfUser() == 1) {
+                    msg += client.room.getID() + ";" + client.room.getPassword()+ ";";
+                }
+            }
+            byte[] encryptedOutput = sc.symmetricEncryption(msg);
+            // Write to client: byte[] encryptedOutput
+            push(encryptedOutput);
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -291,13 +306,12 @@ public class ServerThread implements Runnable {
         try {
             String msg = "broadcastSuccess;" + part[1];
             for (ServerThread client : Server.clientList) {
-                    if (!name.equals(client.name)) {
-                        client.out.writeInt(client.sc.symmetricEncryption(msg).length);
-                        client.out.write(client.sc.symmetricEncryption(msg));
-                        client.out.flush();
-                        System.out.println("Server sent '" + part[1] + "' from Client " + name + "--> Client " + client.name);
-                    }
+                if (!name.equals(client.name)) {
+                    client.out.writeInt(client.sc.symmetricEncryption(msg).length);
+                    client.out.write(client.sc.symmetricEncryption(msg));
+                    client.out.flush();
                 }
+            }
         } catch (Exception ex) {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }

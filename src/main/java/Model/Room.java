@@ -63,7 +63,7 @@ public class Room {
     }
 
     public Room(ServerThread user1) {
-        System.out.println("Tạo phòng thành công, ID là: " + Server.roomId);
+        System.out.println("Create new room successfully, ID is: " + Server.roomId);
         this.password = " ";
         this.ID = Server.roomId++;
         userDal = new UserDAL();
