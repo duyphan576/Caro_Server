@@ -132,11 +132,12 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("caro")) {
                     byte[] msg = sc.symmetricEncryption(encryptedMsg);
                     room.getCompetitor(name).push(msg);
-                }else if (part[0].equals("viewListRoom")) {
+                } else if (part[0].equals("joinRoom")) {
+                    System.out.println(encryptedMsg);
+                    joinRoom(part);
+                } else if (part[0].equals("viewListRoom")) {
                     viewListRoom(part);
-                }else if (part[0].equals("viewListRoom")) {
-                    viewListRoom(part);
-                }else if (part[0].equals("viewListRoom")) {
+                } else if (part[0].equals("viewListRoom")) {
                     viewListRoom(part);
                 }
             }
@@ -153,6 +154,20 @@ public class ServerThread implements Runnable {
         out.writeInt(msg.length);
         out.write(msg);
         out.flush();
+    }
+
+    public void joinRoom(String[] part) {
+        String[] messageSplit = part;
+        int ID_room = Integer.parseInt(messageSplit[1]);
+        for (ServerThread client : Server.clientList) {
+            if (client.room != null && client.room.getID() == ID_room) {
+                client.room.setUser2(this);
+                this.room = client.room;
+                System.out.println("Đã vào phòng " + room.getID());
+                goToPartnerRoom();
+                break;
+            }
+        }
     }
 
     public String convertByteToHex(byte[] data) {
@@ -182,7 +197,7 @@ public class ServerThread implements Runnable {
                     this.room = client.room;
                     System.out.println("Đã vào phòng " + room.getID());
                     goToPartnerRoom();
-                    userDAL.setOnlOff(this.user.getUserId(),2);
+                    userDAL.setOnlOff(this.user.getUserId(), 2);
                     isFinded = true;
                     //Xử lý phần mời cả 2 người chơi vào phòng
                     break;
@@ -372,7 +387,7 @@ public class ServerThread implements Runnable {
 
     public void goToPartnerRoom() {
         try {
-            String msg = "goToRoom;" + room.getID() + ";" + room.getCompetitor(this.getName()).getClientIP() + ";0;"
+            String msg = "goToRoom;" + room.getID() + ";" + room.getCompetitor(this.getName()).getClientIP() + ";0;" //getcomettitor la tra ve user trai nguoc
                     + getStringFromUser(room.getCompetitor(this.getName()).getUser());
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput

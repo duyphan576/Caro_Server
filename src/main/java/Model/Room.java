@@ -117,4 +117,5 @@ public class Room {
         userDal.updateDrawMatch(user1.getUser().getUserId());
         userDal.updateDrawMatch(user2.getUser().getUserId());
     }
+    
 }
