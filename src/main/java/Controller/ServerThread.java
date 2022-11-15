@@ -394,7 +394,7 @@ public class ServerThread implements Runnable {
             // Write to client: byte[] encryptedOutput
             push(encryptedOutput);
             msg = "goToRoom;" + room.getID() + ";" + this.clientIP + ";1;" + getStringFromUser(user);
-            encryptedOutput = sc.symmetricEncryption(msg);
+            encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput
             room.getCompetitor(this.name).push(encryptedOutput);
         } catch (Exception ex) {
