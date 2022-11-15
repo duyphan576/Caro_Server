@@ -226,17 +226,18 @@ public class ServerThread implements Runnable {
 
     public void login(String[] part) {
         try {
+            User us = new User();
+            us.setUserName(part[1].trim());
+            us.setPassword(getMD5(part[2].trim()));
             user = new User();
-            user.setUserName(part[1].trim());
-            user.setPassword(getMD5(part[2].trim()));
-            User us = userDAL.verifyUser(user);
-            name = us.getNickname();
-            String msg = "loginSuccess;" + getStringFromUser(us);
-            if (us.getUserId() != 0) {
+            user = userDAL.verifyUser(us);
+            name = user.getNickname();
+            String msg = "loginSuccess;" + getStringFromUser(user);
+            if (user.getUserId() != 0) {
                 byte[] encryptedOutput = sc.symmetricEncryption(msg);
                 // Write to client: byte[] encryptedOutput
                 push(encryptedOutput);
-                userDAL.setOnlOff(us.getUserId(), 1);
+                userDAL.setOnlOff(user.getUserId(), 1);
                 System.out.println("User " + name + " online");
             } else {
                 byte[] encryptedOutput = sc.symmetricEncryption("Fail");
