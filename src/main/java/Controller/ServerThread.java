@@ -161,8 +161,8 @@ public class ServerThread implements Runnable {
         int ID_room = Integer.parseInt(messageSplit[1]);
         for (ServerThread client : Server.clientList) {
             if (client.room != null && client.room.getID() == ID_room) {
+                this.room = client.getRoom();
                 client.room.setUser2(this);
-                this.room = client.room;
                 System.out.println("Đã vào phòng " + room.getID());
                 goToPartnerRoom();
                 break;
@@ -394,7 +394,7 @@ public class ServerThread implements Runnable {
             // Write to client: byte[] encryptedOutput
             push(encryptedOutput);
             msg = "goToRoom;" + room.getID() + ";" + this.clientIP + ";1;" + getStringFromUser(user);
-            encryptedOutput = sc.symmetricEncryption(msg);
+            encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             // Write to client: byte[] encryptedOutput
             room.getCompetitor(this.name).push(encryptedOutput);
         } catch (Exception ex) {
