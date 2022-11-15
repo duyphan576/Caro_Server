@@ -130,8 +130,8 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("viewListRoom")) {
                     viewListRoom(part);
                 } else if (part[0].equals("caro")) {
-                    byte[] msg = sc.symmetricEncryption(encryptedMsg);
-                    room.getCompetitor(name).push(msg);
+                    byte[] msg = room.getCompetitor(this.name).sc.symmetricEncryption(encryptedMsg);
+                    room.getCompetitor(this.name).push(msg);
                 } else if (part[0].equals("joinRoom")) {
                     System.out.println(encryptedMsg);
                     joinRoom(part);
