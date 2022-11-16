@@ -83,7 +83,6 @@ public class ServerThread implements Runnable {
     public void run() {
         try {
             System.out.println("Client " + socket.toString() + " accepted");
-
             String encryptedMsg = null;
             sc.generateAsymmetricKeyPair();
             byte[] key = sc.getPublicKeyAsByteArray();
@@ -97,6 +96,7 @@ public class ServerThread implements Runnable {
                 in.readFully(encryptedInput, 0, encryptedInput.length);
             }
             encryptedMsg = sc.processInitialMsg(encryptedInput);
+            System.out.println(encryptedMsg);
             while (true) {
                 // Servers nhận dữ liệu từ client qua stream
                 // read length of incoming message
@@ -109,6 +109,7 @@ public class ServerThread implements Runnable {
                 }
                 //Read from client: byte[] encryptedMsg
                 encryptedMsg = sc.symmetricDecryption(encryptedInput);
+                System.out.println(encryptedMsg);
                 String[] part = encryptedMsg.split(";");
                 if (part[0].equals("Exit")) {
                     userDAL.setOnlOff(Integer.parseInt(part[1]), 0);
@@ -133,12 +134,14 @@ public class ServerThread implements Runnable {
                     byte[] msg = room.getCompetitor(this.name).sc.symmetricEncryption(encryptedMsg);
                     room.getCompetitor(this.name).push(msg);
                 } else if (part[0].equals("joinRoom")) {
-                    System.out.println(encryptedMsg);
                     joinRoom(part);
-                } else if (part[0].equals("viewListRoom")) {
-                    viewListRoom(part);
-                } else if (part[0].equals("viewListRoom")) {
-                    viewListRoom(part);
+                } else if (part[0].equals("draw-request")) {
+                    drawrequest();
+                } else if (part[0].equals("draw-confirm")) {
+                  
+                    userDAL.updateDrawMatch(user.getUserId());
+                    room.getCompetitor(this.name).userDAL.updateDrawMatch(room.getCompetitor(this.name).getUser().getUserId());
+                    drawconfigfishned();
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -400,5 +403,27 @@ public class ServerThread implements Runnable {
         } catch (Exception ex) {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void drawrequest() throws Exception {
+        String msg = "draw-request;";
+        byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+        // Write to client: byte[] encryptedOutput
+        room.getCompetitor(this.name).push(encryptedOutput);
+    }
+
+    
+        public void drawconfigfishned(){
+            try {
+            String msg = "draw-confirm-fishned";
+            byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+            room.getCompetitor(this.name).push(encryptedOutput);
+            String msg1 = "draw-confirm-fishned";
+            byte[] encryptedOutput1 = sc.symmetricEncryption(msg1);
+            push(encryptedOutput1);
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }
