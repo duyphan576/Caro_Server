@@ -138,10 +138,13 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("draw-request")) {
                     drawrequest();
                 } else if (part[0].equals("draw-confirm")) {
-                  
                     userDAL.updateDrawMatch(user.getUserId());
                     room.getCompetitor(this.name).userDAL.updateDrawMatch(room.getCompetitor(this.name).getUser().getUserId());
                     drawconfigfishned();
+                }else if (part[0].equals("lose-request")) {
+                    userDAL.updateWin(room.getCompetitor(this.name).getUser().getUserId());
+                    userDAL.updateLose(user.getUserId());
+                    loseconfigfishned();
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -412,13 +415,25 @@ public class ServerThread implements Runnable {
         room.getCompetitor(this.name).push(encryptedOutput);
     }
 
-    
-        public void drawconfigfishned(){
-            try {
+    public void drawconfigfishned() {
+        try {
             String msg = "draw-confirm-fishned";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             room.getCompetitor(this.name).push(encryptedOutput);
             String msg1 = "draw-confirm-fishned";
+            byte[] encryptedOutput1 = sc.symmetricEncryption(msg1);
+            push(encryptedOutput1);
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    public void loseconfigfishned() {
+        try {
+            String msg ="lose-confirm-fishned";
+            byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+            room.getCompetitor(this.name).push(encryptedOutput);
+            String msg1 ="lose-confirm-fishned";
             byte[] encryptedOutput1 = sc.symmetricEncryption(msg1);
             push(encryptedOutput1);
         } catch (Exception ex) {
