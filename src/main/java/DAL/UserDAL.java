@@ -281,21 +281,25 @@ public class UserDAL extends DatabaseConnection {
     }
     public int updateWin(int id) throws SQLException{
         User gr = getGrade(id);
-        String query = "UPDATE user SET `WinMatch` = ?, `CurrentWinStreak` = ?, WHERE `UserId` = ?";
+        String query = "UPDATE user SET `WinMatch` = ?, `CurrentWinStreak` = ?, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         int value = gr.getWinMatch()+1;
         int value1 = gr.getCurrentWinStreak()+1;
         p.setInt(1, value);
         p.setInt(2, value1);
+        p.setInt(3, id);
         int rs = p.executeUpdate();
         return rs;
     }
     public int updateLose(int id) throws SQLException{
         User gr = getGrade(id);
-        String query = "UPDATE user SET `LoseMatch` = ?, `CurrentLoseStreak` = 0, WHERE `UserId` = ?";
+        String query = "UPDATE user SET `LoseMatch` = ?, `CurrentLoseStreak` = ?, `CurrentWinStreak` = 0 WHERE `UserId` = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         int value = gr.getLoseMatch()+1;
+        int value1 = gr.getCurrentLoseStreak()+1;
         p.setInt(1, value);
+        p.setInt(2, value1);
+        p.setInt(3, id);
         int rs = p.executeUpdate();
         return rs;
     }

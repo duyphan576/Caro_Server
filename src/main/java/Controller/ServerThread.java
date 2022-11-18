@@ -133,7 +133,10 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("caro")) {
                     byte[] msg = room.getCompetitor(this.name).sc.symmetricEncryption(encryptedMsg);
                     room.getCompetitor(this.name).push(msg);
-                } else if (part[0].equals("joinRoom")) {
+                } else if (part[0].equals("send-lose")) {
+                    byte[] msg = room.getCompetitor(this.name).sc.symmetricEncryption(encryptedMsg);
+                    room.getCompetitor(this.name).push(msg);
+                }else if (part[0].equals("joinRoom")) {
                     joinRoom(part);
                 } else if (part[0].equals("draw-request")) {
                     drawrequest();
@@ -141,10 +144,22 @@ public class ServerThread implements Runnable {
                     userDAL.updateDrawMatch(user.getUserId());
                     room.getCompetitor(this.name).userDAL.updateDrawMatch(room.getCompetitor(this.name).getUser().getUserId());
                     drawconfigfishned();
-                }else if (part[0].equals("lose-request")) {
-                    userDAL.updateWin(room.getCompetitor(this.name).getUser().getUserId());
-                    userDAL.updateLose(user.getUserId());
+                } else if (part[0].equals("lose-request")) {
+                    userDAL.updateWin(Integer.parseInt(part[1]));
+                    userDAL.updateLose(Integer.parseInt(part[2]));
                     loseconfigfishned();
+                }else if (part[0].equals("win-request")) {
+                    userDAL.updateLose(Integer.parseInt(part[1]));
+                    userDAL.updateWin(Integer.parseInt(part[2]));
+                    winrequest();
+                }else if (part[0].equals("again-refuse")) {
+                    againrefuse();
+                } else if (part[0].equals("again-confirm")) {
+                    againconfirm1();
+                } else if (part[0].equals("again-confirm-1")) {
+                    againconfirm();
+                } else if (part[0].equals("quick-room")) {
+                    quickroom();
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -166,12 +181,17 @@ public class ServerThread implements Runnable {
         String[] messageSplit = part;
         int ID_room = Integer.parseInt(messageSplit[1]);
         for (ServerThread client : Server.clientList) {
-            if (client.room != null && client.room.getID() == ID_room) {
+            if (client.room != null && client.room.getID() == ID_room && messageSplit.length==2) {
                 this.room = client.getRoom();
                 client.room.setUser2(this);
                 System.out.println("Đã vào phòng " + room.getID());
                 goToPartnerRoom();
                 break;
+            }else if (client.room != null && client.room.getID() == ID_room && messageSplit.length==3 && client.room.getPassword().equals(messageSplit[2])){
+                this.room = client.getRoom();
+                client.room.setUser2(this);
+                System.out.println("Đã vào phòng " + room.getID());
+                goToPartnerRoom();
             }
         }
     }
@@ -414,6 +434,25 @@ public class ServerThread implements Runnable {
         // Write to client: byte[] encryptedOutput
         room.getCompetitor(this.name).push(encryptedOutput);
     }
+    public void againrefuse() throws Exception {
+        String msg = "again-refuse;";
+        byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+        room.getCompetitor(this.name).push(encryptedOutput);
+        byte[] encryptedOutput1 = sc.symmetricEncryption(msg);
+        push(encryptedOutput1);
+    }
+    public void againconfirm1() throws Exception {
+        String msg = "again-confirm-1;";
+        byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+        room.getCompetitor(this.name).push(encryptedOutput);
+    }
+    public void againconfirm() throws Exception {
+        String msg = "again-confirm;";
+        byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+        room.getCompetitor(this.name).push(encryptedOutput);
+         byte[] encryptedOutput1 = sc.symmetricEncryption(msg);
+        push(encryptedOutput1);
+    }
 
     public void drawconfigfishned() {
         try {
@@ -428,17 +467,43 @@ public class ServerThread implements Runnable {
         }
 
     }
-    public void loseconfigfishned() {
+    public void winrequest(){
         try {
-            String msg ="lose-confirm-fishned";
+            String msg = "win-request;0";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             room.getCompetitor(this.name).push(encryptedOutput);
-            String msg1 ="lose-confirm-fishned";
+            String msg1 = "win-request;1";
             byte[] encryptedOutput1 = sc.symmetricEncryption(msg1);
             push(encryptedOutput1);
         } catch (Exception ex) {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+    }
+    public void loseconfigfishned() {
+        try {
+            String msg = "lose-confirm-fishned";
+            byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+            room.getCompetitor(this.name).push(encryptedOutput);
+            String msg1 = "lose-confirm-fishned";
+            byte[] encryptedOutput1 = sc.symmetricEncryption(msg1);
+            push(encryptedOutput1);
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public void quickroom(){
+        try {
+            for (ServerThread client : Server.clientList) {
+                if (client.room!= null && client.room.getNumberOfUser() == 1 && client.room.getPassword().equals(" ")) {
+                            client.room.setUser2(this);
+                            this.room = client.room;
+                            System.out.println("Đã vào phòng " + room.getID());
+                            goToPartnerRoom();
+                            break;
+                        }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
