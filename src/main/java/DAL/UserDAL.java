@@ -41,12 +41,13 @@ public class UserDAL extends DatabaseConnection {
     }
 
     public int updateUser(User us) throws SQLException {
-        String query = "UPDATE user SET Password = ?, Nickname = ?, Sex = ?, Birthday = ? WHERE UserId = ?";
+        String query = "UPDATE user SET Username = ?,Password = ?, Nickname = ?, Sex = ?, Birthday = ? WHERE UserId = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
-        p.setString(1, us.getPassword());
-        p.setString(2, us.getNickname());
-        p.setInt(3, us.getSex());
-        p.setDate(4, us.getBirthday());
+        p.setString(1, us.getUserName());
+        p.setString(2, us.getPassword());
+        p.setString(3, us.getNickname());
+        p.setInt(4, us.getSex());
+        p.setDate(5, us.getBirthday());
         p.setInt(6, us.getUserId());
         int result = p.executeUpdate();
         return result;

@@ -160,6 +160,11 @@ public class ServerThread implements Runnable {
                     againconfirm();
                 } else if (part[0].equals("quick-room")) {
                     quickroom();
+                }else if (part[0].equals("ChanceUser-1")) {
+                    chanceuser(part);
+                }else if (part[0].equals("ChanceUser")) {
+                      byte[] encryptedOutput = sc.symmetricEncryption(part[0]);
+                      push(encryptedOutput);
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -301,6 +306,32 @@ public class ServerThread implements Runnable {
         }
 
     }
+    public void chanceuser(String[] part) {
+        try {
+            User us = new User();
+            us.setUserId(Integer.parseInt(part[1]));
+            us.setUserName(part[2]);
+            us.setPassword(getMD5(part[3].trim()));
+            us.setNickname(part[4]);
+            us.setSex(Integer.parseInt(part[5]));
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date parsed = format.parse(part[6]);
+            java.sql.Date sql = new java.sql.Date(parsed.getTime());
+            us.setBirthday(sql);
+            if (userDAL.updateUser(us) != 0) {
+                String msg = "ChanceUserSuccess;"+getStringFromUser(us);
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+                System.out.println("Update user");
+            } else {
+                byte[] encryptedOutput = sc.symmetricEncryption("Fail");
+                push(encryptedOutput);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
 
     public void rank(String[] part) {
         try {
@@ -389,7 +420,7 @@ public class ServerThread implements Runnable {
     }
 
     public String getStringFromUser(User us) throws SQLException {
-        return String.valueOf(us.getUserId()) + ";" + us.getUserName() + ";" + us.getPassword() + ";" + us.getNickname() + ";" + String.valueOf(us.getSex()) + ";" + us.getBirthday().toString()
+        return String.valueOf(us.getUserId()) + ";" + us.getUserName() + ";" + getMD5(us.getPassword()) + ";" + us.getNickname() + ";" + String.valueOf(us.getSex()) + ";" + us.getBirthday().toString()
                 + ";" + String.valueOf(us.getUserId()) + ";" + String.valueOf(us.getGrade()) + ";" + String.valueOf(us.getWinMatch()) + ";" + String.valueOf(us.getLoseMatch()) + ";" + String.valueOf(us.getDrawMatch())
                 + ";" + String.valueOf(us.getCurrentWinStreak()) + ";" + String.valueOf(us.getMaxWinStreak())
                 + ";" + String.valueOf(us.getCurrentLoseStreak()) + ";" + String.valueOf(us.getMaxLoseStreak()) + ";" + Float.toString(userDAL.getWinRate(us.getUserId()));
