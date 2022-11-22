@@ -27,7 +27,7 @@ public class Server {
     public static volatile ServerThreadBus serverThreadBus;
     public static Vector<ServerThread> clientList = new Vector<>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
         try {
             InetAddress ip;
             ip = InetAddress.getLocalHost();
@@ -52,8 +52,6 @@ public class Server {
                 socket = server.accept();
                 ServerThread client = new ServerThread(socket, Integer.toString(i++));
                 clientList.add(client);
-//                serverThreadBus.add(client);
-//                System.out.println("Number of threads running is: "+serverThreadBus.getLength());
                 executor.execute(client);
             }
         } catch (IOException e) {
