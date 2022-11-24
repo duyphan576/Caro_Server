@@ -136,7 +136,7 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("send-lose")) {
                     byte[] msg = room.getCompetitor(this.name).sc.symmetricEncryption(encryptedMsg);
                     room.getCompetitor(this.name).push(msg);
-                }else if (part[0].equals("joinRoom")) {
+                } else if (part[0].equals("joinRoom")) {
                     joinRoom(part);
                 } else if (part[0].equals("draw-request")) {
                     drawrequest();
@@ -148,11 +148,11 @@ public class ServerThread implements Runnable {
                     userDAL.updateWin(Integer.parseInt(part[1]));
                     userDAL.updateLose(Integer.parseInt(part[2]));
                     loseconfigfishned();
-                }else if (part[0].equals("win-request")) {
+                } else if (part[0].equals("win-request")) {
                     userDAL.updateLose(Integer.parseInt(part[1]));
                     userDAL.updateWin(Integer.parseInt(part[2]));
                     winrequest();
-                }else if (part[0].equals("again-refuse")) {
+                } else if (part[0].equals("again-refuse")) {
                     againrefuse();
                 } else if (part[0].equals("again-confirm")) {
                     againconfirm1();
@@ -160,11 +160,11 @@ public class ServerThread implements Runnable {
                     againconfirm();
                 } else if (part[0].equals("quick-room")) {
                     quickroom();
-                }else if (part[0].equals("ChanceUser-1")) {
+                } else if (part[0].equals("ChanceUser-1")) {
                     chanceuser(part);
-                }else if (part[0].equals("ChanceUser")) {
-                      byte[] encryptedOutput = sc.symmetricEncryption(part[0]);
-                      push(encryptedOutput);
+                } else if (part[0].equals("ChanceUser")) {
+                    byte[] encryptedOutput = sc.symmetricEncryption(part[0]);
+                    push(encryptedOutput);
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -186,13 +186,13 @@ public class ServerThread implements Runnable {
         String[] messageSplit = part;
         int ID_room = Integer.parseInt(messageSplit[1]);
         for (ServerThread client : Server.clientList) {
-            if (client.room != null && client.room.getID() == ID_room && messageSplit.length==2) {
+            if (client.room != null && client.room.getID() == ID_room && messageSplit.length == 2) {
                 this.room = client.getRoom();
                 client.room.setUser2(this);
                 System.out.println("Đã vào phòng " + room.getID());
                 goToPartnerRoom();
                 break;
-            }else if (client.room != null && client.room.getID() == ID_room && messageSplit.length==3 && client.room.getPassword().equals(messageSplit[2])){
+            } else if (client.room != null && client.room.getID() == ID_room && messageSplit.length == 3 && client.room.getPassword().equals(messageSplit[2])) {
                 this.room = client.getRoom();
                 client.room.setUser2(this);
                 System.out.println("Đã vào phòng " + room.getID());
@@ -306,6 +306,7 @@ public class ServerThread implements Runnable {
         }
 
     }
+
     public void chanceuser(String[] part) {
         try {
             User us = new User();
@@ -319,7 +320,7 @@ public class ServerThread implements Runnable {
             java.sql.Date sql = new java.sql.Date(parsed.getTime());
             us.setBirthday(sql);
             if (userDAL.updateUser(us) != 0) {
-                String msg = "ChanceUserSuccess;"+getStringFromUser(us);
+                String msg = "ChanceUserSuccess;" + getStringFromUser(us);
                 byte[] encryptedOutput = sc.symmetricEncryption(msg);
                 push(encryptedOutput);
                 System.out.println("Update user");
@@ -465,6 +466,7 @@ public class ServerThread implements Runnable {
         // Write to client: byte[] encryptedOutput
         room.getCompetitor(this.name).push(encryptedOutput);
     }
+
     public void againrefuse() throws Exception {
         String msg = "again-refuse;";
         byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
@@ -472,16 +474,18 @@ public class ServerThread implements Runnable {
         byte[] encryptedOutput1 = sc.symmetricEncryption(msg);
         push(encryptedOutput1);
     }
+
     public void againconfirm1() throws Exception {
         String msg = "again-confirm-1;";
         byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
         room.getCompetitor(this.name).push(encryptedOutput);
     }
+
     public void againconfirm() throws Exception {
         String msg = "again-confirm;";
         byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
         room.getCompetitor(this.name).push(encryptedOutput);
-         byte[] encryptedOutput1 = sc.symmetricEncryption(msg);
+        byte[] encryptedOutput1 = sc.symmetricEncryption(msg);
         push(encryptedOutput1);
     }
 
@@ -498,7 +502,8 @@ public class ServerThread implements Runnable {
         }
 
     }
-    public void winrequest(){
+
+    public void winrequest() {
         try {
             String msg = "win-request;0";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
@@ -510,6 +515,7 @@ public class ServerThread implements Runnable {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     public void loseconfigfishned() {
         try {
             String msg = "lose-confirm-fishned";
@@ -522,16 +528,17 @@ public class ServerThread implements Runnable {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public void quickroom(){
+
+    public void quickroom() {
         try {
             for (ServerThread client : Server.clientList) {
-                if (client.room!= null && client.room.getNumberOfUser() == 1 && client.room.getPassword().equals(" ")) {
-                            client.room.setUser2(this);
-                            this.room = client.room;
-                            System.out.println("Đã vào phòng " + room.getID());
-                            goToPartnerRoom();
-                            break;
-                        }
+                if (client.room != null && client.room.getNumberOfUser() == 1 && client.room.getPassword().equals(" ")) {
+                    client.room.setUser2(this);
+                    this.room = client.room;
+                    System.out.println("Đã vào phòng " + room.getID());
+                    goToPartnerRoom();
+                    break;
+                }
             }
         } catch (Exception ex) {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
