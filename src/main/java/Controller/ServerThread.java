@@ -18,8 +18,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -156,6 +154,8 @@ public class ServerThread implements Runnable {
                     againConfirm();
                 } else if (part[0].equals("QuickPlay")) {
                     quickPlay();
+                } else if (part[0].equals("Chat")) {
+
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -228,6 +228,16 @@ public class ServerThread implements Runnable {
             // Write to client: byte[] encryptedOutput
             room.getCompetitor(this.name).push(encryptedOutput);
         } catch (Exception ex) {
+            System.out.println("Error");
+        }
+    }
+
+    public void chat(String[] part) {
+        try {
+            String msg = "Chat;" + part[1];
+            byte[] encryptedOutput = sc.symmetricEncryption(msg);
+            room.getCompetitor(name).push(encryptedOutput);
+        } catch (Exception e) {
             System.out.println("Error");
         }
     }
