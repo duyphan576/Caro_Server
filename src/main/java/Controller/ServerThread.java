@@ -107,6 +107,7 @@ public class ServerThread implements Runnable {
                 //Read from client: byte[] encryptedMsg
                 encryptedMsg = sc.symmetricDecryption(encryptedInput);
                 String[] part = encryptedMsg.split(";");
+                System.out.println(encryptedMsg);
                 if (part[0].equals("Exit")) {
                     userDAL.setOnlOff(Integer.parseInt(part[1]), 0);
                     break;
@@ -159,7 +160,9 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("Chat")) {
                     chat(part);
                 } else if (part[0].equals("ChangePassword")) {
-
+                    changePassword(part);
+                } else if (part[0].equals("ChangeInfo")) {
+                    changeInfo(part);
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -267,22 +270,24 @@ public class ServerThread implements Runnable {
     }
 
     public void changeInfo(String[] part) {
+        
         try {
             User us = new User();
             us.setUserId(Integer.parseInt(part[1]));
             us.setNickname(part[2]);
             us.setSex(Integer.parseInt(part[3]));
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            Date parsed = format.parse(part[5]);
+            Date parsed = format.parse(part[4]);
             java.sql.Date sql = new java.sql.Date(parsed.getTime());
             us.setBirthday(sql);
-            userDAL.updatePassword(us);
+            userDAL.updateInfo(us);
             String msg = "ChangeInfo;Success";
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             push(encryptedOutput);
         } catch (Exception ex) {
-            System.out.println("Error");
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }
 
     public void joinRoom(String[] part) {
@@ -374,7 +379,7 @@ public class ServerThread implements Runnable {
     public void rank(String[] part) {
         try {
             List list = userDAL.getRank();
-            String msg = "Rank;";
+            String msg = "Rank";
             if (!list.isEmpty()) {
                 for (int i = 0; i < list.size(); i++) {
                     User grd = (User) list.get(i);
