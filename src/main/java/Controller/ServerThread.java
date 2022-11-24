@@ -536,12 +536,12 @@ public class ServerThread implements Runnable {
 
     public void surrenderConfirm() {
         try {
-            String msg = "SurrenderConfirm";
+            String msg = "SurrenderConfirm;";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             room.getCompetitor(this.name).push(encryptedOutput);
-            String msg1 = "SurrenderConfirm";
-            byte[] encryptedOutput1 = sc.symmetricEncryption(msg1);
-            push(encryptedOutput1);
+            msg = "SurrenderConfirm;";
+            encryptedOutput = sc.symmetricEncryption(msg);
+            push(encryptedOutput);
         } catch (Exception ex) {
             System.out.println("Error");
         }
