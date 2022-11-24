@@ -40,14 +40,22 @@ public class UserDAL extends DatabaseConnection {
         return result;
     }
 
-    public int updateUser(User us) throws SQLException {
-        String query = "UPDATE user SET Password = ?, Nickname = ?, Sex = ?, Birthday = ? WHERE UserId = ?";
+    public int updateInfo(User us) throws SQLException {
+        String query = "UPDATE user SET Nickname = ?, Sex = ?, Birthday = ? WHERE UserId = ?";
+        PreparedStatement p = this.getConnection().prepareStatement(query);
+        p.setString(1, us.getNickname());
+        p.setInt(2, us.getSex());
+        p.setDate(3, us.getBirthday());
+        p.setInt(4, us.getUserId());
+        int result = p.executeUpdate();
+        return result;
+    }
+    
+    public int updatePassword(User us) throws SQLException {
+        String query = "UPDATE user SET Password = ? WHERE UserId = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setString(1, us.getPassword());
-        p.setString(2, us.getNickname());
-        p.setInt(3, us.getSex());
-        p.setDate(4, us.getBirthday());
-        p.setInt(6, us.getUserId());
+        p.setInt(2, us.getUserId());
         int result = p.executeUpdate();
         return result;
     }

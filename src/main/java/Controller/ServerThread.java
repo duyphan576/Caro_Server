@@ -18,6 +18,8 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -155,6 +157,8 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("QuickPlay")) {
                     quickPlay();
                 } else if (part[0].equals("Chat")) {
+                    chat(part);
+                } else if (part[0].equals("ChangePassword")) {
 
                 }
             }
@@ -235,9 +239,48 @@ public class ServerThread implements Runnable {
     public void chat(String[] part) {
         try {
             String msg = "Chat;" + part[1];
-            byte[] encryptedOutput = sc.symmetricEncryption(msg);
+            byte[] encryptedOutput = room.getCompetitor(name).sc.symmetricEncryption(msg);
             room.getCompetitor(name).push(encryptedOutput);
         } catch (Exception e) {
+            System.out.println("Error");
+        }
+    }
+
+    public void changePassword(String[] part) {
+        try {
+            User us = new User();
+            if (user.getPassword().equals(getMD5(part[2]))) {
+                us.setUserId(Integer.parseInt(part[1]));
+                us.setPassword(getMD5(part[3]));
+                userDAL.updatePassword(us);
+                String msg = "ChangePassword;Success";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } else {
+                String msg = "ChangePassword;Your old password is not correct";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            }
+        } catch (Exception ex) {
+            System.out.println("Error");
+        }
+    }
+
+    public void changeInfo(String[] part) {
+        try {
+            User us = new User();
+            us.setUserId(Integer.parseInt(part[1]));
+            us.setNickname(part[2]);
+            us.setSex(Integer.parseInt(part[3]));
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date parsed = format.parse(part[5]);
+            java.sql.Date sql = new java.sql.Date(parsed.getTime());
+            us.setBirthday(sql);
+            userDAL.updatePassword(us);
+            String msg = "ChangeInfo;Success";
+            byte[] encryptedOutput = sc.symmetricEncryption(msg);
+            push(encryptedOutput);
+        } catch (Exception ex) {
             System.out.println("Error");
         }
     }
