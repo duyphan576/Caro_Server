@@ -36,6 +36,7 @@ public class ServerThread implements Runnable {
     private String name;
     private Room room;
     private String clientIP;
+    private boolean isLogin = false;
 
     public ServerThread(Socket s, String n) throws IOException {
         this.socket = s;
@@ -172,8 +173,12 @@ public class ServerThread implements Runnable {
             out.close();
             socket.close();
         } catch (Exception ex) {
-            System.out.println("Client is closed");
-
+            try {
+                System.out.println("Client is closed");
+                userDAL.setStatus(user.getUserId(), 0);
+            } catch (SQLException e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -297,16 +302,24 @@ public class ServerThread implements Runnable {
         int ID_room = Integer.parseInt(messageSplit[1]);
         for (ServerThread client : Server.clientList) {
             if (client.room != null && client.room.getID() == ID_room && messageSplit.length == 2) {
-                this.room = client.getRoom();
-                client.room.setUser2(this);
-                System.out.println("Đã vào phòng " + room.getID());
-                goToPartnerRoom();
-                break;
+                try {
+                    this.room = client.getRoom();
+                    client.room.setUser2(this);
+                    client.userDAL.setStatus(client.user.getUserId(), 2);
+                    goToPartnerRoom();
+                    break;
+                } catch (SQLException ex) {
+                    System.out.println("Error");
+                }
             } else if (client.room != null && client.room.getID() == ID_room && messageSplit.length == 3 && client.room.getPassword().equals(messageSplit[2])) {
-                this.room = client.getRoom();
-                client.room.setUser2(this);
-                System.out.println("Đã vào phòng " + room.getID());
-                goToPartnerRoom();
+                try {
+                    this.room = client.getRoom();
+                    client.room.setUser2(this);
+                    client.userDAL.setStatus(client.user.getUserId(), 2);
+                    goToPartnerRoom();
+                } catch (SQLException ex) {
+                    System.out.println("Error");
+                }
             }
         }
     }
@@ -342,13 +355,14 @@ public class ServerThread implements Runnable {
                 push(encryptedOutput);
                 userDAL.setStatus(user.getUserId(), 1);
                 System.out.println("User " + name + " online");
+                isLogin = true;
             } else {
                 byte[] encryptedOutput = sc.symmetricEncryption("Fail");
                 // Write to client: byte[] encryptedOutput
                 push(encryptedOutput);
             }
         } catch (Exception ex) {
-            System.out.println("Error");
+            String msg = "Error;Username or Password is uncorrect.";
         }
     }
 
@@ -431,8 +445,13 @@ public class ServerThread implements Runnable {
             for (User us : l) {
                 msg += ";" + us.getNickname() + ";" + String.valueOf(us.getStatus());
             }
-            byte[] encryptedOutput = sc.symmetricEncryption(msg);
-            push(encryptedOutput);
+            for (ServerThread client : Server.clientList) {
+                if (isLogin) {
+                    client.out.writeInt(client.sc.symmetricEncryption(msg).length);
+                    client.out.write(client.sc.symmetricEncryption(msg));
+                    client.out.flush();
+                }
+            }
         } catch (Exception ex) {
             System.out.println("Error");
         }
@@ -569,8 +588,8 @@ public class ServerThread implements Runnable {
 
     public void getInfo(String a) {
         try {
-            user= userDAL.getInfo(Integer.parseInt(a));
-            String msg = "GetInfo;"+getStringFromUser(user);
+            user = userDAL.getInfo(Integer.parseInt(a));
+            String msg = "GetInfo;" + getStringFromUser(user);
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             push(encryptedOutput);
         } catch (Exception ex) {
