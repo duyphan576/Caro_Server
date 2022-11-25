@@ -109,7 +109,7 @@ public class ServerThread implements Runnable {
                 String[] part = encryptedMsg.split(";");
                 System.out.println(encryptedMsg);
                 if (part[0].equals("Exit")) {
-                    userDAL.setOnlOff(Integer.parseInt(part[1]), 0);
+                    userDAL.setStatus(Integer.parseInt(part[1]), 0);
                     break;
                 } else if (part[0].equals("Register")) {
                     register(part);
@@ -122,7 +122,7 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("CreateRoom")) {
                     createRoom(part);
                 } else if (part[0].equals("Logout")) {
-                    userDAL.setOnlOff(Integer.parseInt(part[1]), 0);
+                    userDAL.setStatus(Integer.parseInt(part[1]), 0);
                 } else if (part[0].equals("Broadcast")) {
                     broadcast(part);
                 } else if (part[0].equals("ViewListRoom")) {
@@ -142,12 +142,12 @@ public class ServerThread implements Runnable {
                     room.getCompetitor(this.name).userDAL.updateDrawMatch(room.getCompetitor(this.name).getUser().getUserId());
                     drawConfirm();
                 } else if (part[0].equals("SurrenderRequest")) {
-                    userDAL.updateWin(Integer.parseInt(part[1]));
-                    userDAL.updateLose(Integer.parseInt(part[2]));
+                    userDAL.updateWinMatch(Integer.parseInt(part[1]));
+                    userDAL.updateLoseMatch(Integer.parseInt(part[2]));
                     surrenderConfirm();
                 } else if (part[0].equals("WinRequest")) {
-                    userDAL.updateLose(Integer.parseInt(part[1]));
-                    userDAL.updateWin(Integer.parseInt(part[2]));
+                    userDAL.updateLoseMatch(Integer.parseInt(part[1]));
+                    userDAL.updateWinMatch(Integer.parseInt(part[2]));
                     winRequest();
                 } else if (part[0].equals("AgainRefuse")) {
                     againRefuse();
@@ -338,7 +338,7 @@ public class ServerThread implements Runnable {
                 byte[] encryptedOutput = sc.symmetricEncryption(msg);
                 // Write to client: byte[] encryptedOutput
                 push(encryptedOutput);
-                userDAL.setOnlOff(user.getUserId(), 1);
+                userDAL.setStatus(user.getUserId(), 1);
                 System.out.println("User " + name + " online");
             } else {
                 byte[] encryptedOutput = sc.symmetricEncryption("Fail");
@@ -441,7 +441,7 @@ public class ServerThread implements Runnable {
             String msg = "Logout;";
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             push(encryptedOutput);
-            userDAL.setOnlOff(Integer.parseInt(part[1]), 0);
+            userDAL.setStatus(Integer.parseInt(part[1]), 0);
         } catch (Exception ex) {
             System.out.println("Error");
         }
@@ -554,8 +554,8 @@ public class ServerThread implements Runnable {
                     client.room.setUser2(this);
                     this.room = client.room;
                     System.out.println("Entered the room " + room.getID());
-                    userDAL.setOnlOff(this.user.getUserId(), 2);
-                    room.getCompetitor(this.name).userDAL.setOnlOff(this.user.getUserId(), 2);
+                    userDAL.setStatus(this.user.getUserId(), 2);
+                    room.getCompetitor(this.name).userDAL.setStatus(this.user.getUserId(), 2);
                     goToPartnerRoom();
                     break;
                 }

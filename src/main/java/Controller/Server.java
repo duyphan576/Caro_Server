@@ -24,7 +24,6 @@ public class Server {
     public static int port = 1234;
     public static Socket socket;
     public static int roomId;
-    public static volatile ServerThreadBus serverThreadBus;
     public static Vector<ServerThread> clientList = new Vector<>();
 
     public static void main(String[] args){
@@ -36,7 +35,6 @@ public class Server {
             Jsoup.connect(api).ignoreContentType(true).ignoreHttpErrors(true).header("Content-Type", "application/json")
                     .requestBody(jsonData).method(Connection.Method.PUT).execute();
             ServerSocket server = new ServerSocket(port);
-            serverThreadBus = new ServerThreadBus();
             System.out.println("Server binding at port " + port);
             System.out.println("Waiting for client...");
             ThreadPoolExecutor executor = new ThreadPoolExecutor(

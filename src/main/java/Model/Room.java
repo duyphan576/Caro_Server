@@ -90,16 +90,16 @@ public class Room {
     }
 
     public void setUsersToPlaying() throws SQLException{
-        userDal.setOnlOff(user1.getUser().getUserId(), 2);
+        userDal.setStatus(user1.getUser().getUserId(), 2);
         if(user2!=null){
-            userDal.setOnlOff(user2.getUser().getUserId(), 2);
+            userDal.setStatus(user2.getUser().getUserId(), 2);
         }
     }
     
     public void setUsersToNotPlaying() throws SQLException{
-        userDal.setOnlOff(user1.getUser().getUserId(), 1);
+        userDal.setStatus(user1.getUser().getUserId(), 1);
         if(user2!=null){
-            userDal.setOnlOff(user2.getUser().getUserId(), 1);
+            userDal.setStatus(user2.getUser().getUserId(), 1);
         }
     }
     

@@ -5,17 +5,10 @@
 package DAL;
 
 import Model.User;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -334,7 +327,7 @@ public class UserDAL extends DatabaseConnection {
         return gradeList;
     }
 
-    public int setOnlOff(int id, int status) throws SQLException{
+    public int setStatus(int id, int status) throws SQLException{
         String query = "UPDATE user SET Status = ? Where UserID = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, status);
