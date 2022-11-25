@@ -43,7 +43,7 @@ public class UserDAL extends DatabaseConnection {
         int result = p.executeUpdate();
         return result;
     }
-    
+
     public int updatePassword(User us) throws SQLException {
         String query = "UPDATE user SET Password = ? WHERE UserId = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
@@ -111,7 +111,7 @@ public class UserDAL extends DatabaseConnection {
     }
 
     public ArrayList findUserOnline() throws SQLException {
-        String sql = "Select UserId,Nickname,Status From user ";
+        String sql = "Select UserId, Nickname, Status From user ";
         ArrayList<User> list = new ArrayList();
         PreparedStatement p = this.getConnection().prepareStatement(sql);
         ResultSet rs = p.executeQuery();
@@ -217,95 +217,112 @@ public class UserDAL extends DatabaseConnection {
     public int updateWinMatch(int id) throws SQLException {
         User gr = getGrade(id);
         String query = "";
-        if (gr.getCurrentWinStreak() < gr.getMaxWinStreak()) {
-            query = "UPDATE user SET WinMatch = ?, CurrentWinStreak = ? ,CurrentLoseStreak = 0 WHERE UserID = ?";
+        int rs = 0;
+        if (gr.getCurrentWinStreak() <= gr.getMaxWinStreak()) {
+            query = "UPDATE user SET `WinMatch` = ?, `CurrentWinStreak` = ? , `CurrentLoseStreak` = 0, `Grade` = ? WHERE `UserId` = ?";
             PreparedStatement p = this.getConnection().prepareStatement(query);
             int value1 = gr.getWinMatch() + 1;
             int value2 = gr.getCurrentWinStreak() + 1;
+            int grade = gr.getGrade() + 3;
             p.setInt(1, value1);
             p.setInt(2, value2);
-            p.setInt(3, id);
-            int rs = p.executeUpdate();
-            return rs;
-        } else if ((gr.getCurrentWinStreak() >= gr.getMaxWinStreak())) {
-            query = "UPDATE caro.grade SET `WinMatch` = ?, `CurrentWinStreak` = ?, `MaxWinStreak` = ?, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
+            p.setInt(3, grade);
+            p.setInt(4, id);
+            rs = p.executeUpdate();
+        } else if ((gr.getCurrentWinStreak() > gr.getMaxWinStreak())) {
+            query = "UPDATE user SET `WinMatch` = ?, `CurrentWinStreak` = ?, `MaxWinStreak` = ?, `CurrentLoseStreak` = 0, `Grade` = ? WHERE `UserId` = ?";
             PreparedStatement p = this.getConnection().prepareStatement(query);
             int value1 = gr.getWinMatch() + 1;
             int value2 = gr.getCurrentWinStreak() + 1;
+            int grade = gr.getGrade() + 3;
             p.setInt(1, value1);
             p.setInt(2, value2);
             p.setInt(3, value2);
-            p.setInt(4, id);
-            int rs = p.executeUpdate();
-            return rs;
+            p.setInt(4, grade);
+            p.setInt(5, id);
+            rs = p.executeUpdate();
         }
-        return 0;
+        return rs;
     }
 
     public int updateLoseMatch(int id) throws SQLException {
         User gr = getGrade(id);
         String query = "";
+        int rs = 0;
         if (gr.getCurrentLoseStreak() < gr.getMaxLoseStreak()) {
-            query = "UPDATE user SET LoseMatch = ?, CurrentLoseStreak = ? ,CurrentWinStreak = 0 WHERE UserID = ?";
+            query = "UPDATE user SET `LoseMatch` = ?, `CurrentLoseStreak` = ? , `CurrentWinStreak` = 0, `Grade` = ? WHERE `UserId` = ?";
             PreparedStatement p = this.getConnection().prepareStatement(query);
             int value1 = gr.getLoseMatch() + 1;
             int value2 = gr.getCurrentLoseStreak() + 1;
+            int grade = gr.getGrade() - 2;
+            if (grade < 1) {
+                grade = 0;
+            }
             p.setInt(1, value1);
             p.setInt(2, value2);
-            p.setInt(3, id);
-            int rs = p.executeUpdate();
-            return rs;
+            p.setInt(3, grade);
+            p.setInt(4, id);
+            rs = p.executeUpdate();
         } else if ((gr.getCurrentLoseStreak() >= gr.getMaxLoseStreak())) {
-            query = "UPDATE user SET `LoseMatch` = ?, `CurrentLoseStreak` = ?, `MaxLoseStreak` = ?, `CurrentWinStreak` = 0 WHERE `UserId` = ?";
+            query = "UPDATE user SET `LoseMatch` = ?, `CurrentLoseStreak` = ?, `MaxLoseStreak` = ?, `CurrentWinStreak` = 0, `Grade` = ? WHERE `UserId` = ?";
             PreparedStatement p = this.getConnection().prepareStatement(query);
             int value1 = gr.getLoseMatch() + 1;
             int value2 = gr.getCurrentLoseStreak() + 1;
+            int grade = gr.getGrade() - 2;
+            if (grade < 1) {
+                grade = 0;
+            }
             p.setInt(1, value1);
             p.setInt(2, value2);
             p.setInt(3, value2);
-            p.setInt(4, id);
-            int rs = p.executeUpdate();
-            return rs;
+            p.setInt(4, grade);
+            p.setInt(5, id);
+            rs = p.executeUpdate();
         }
-        return 0;
+        return rs;
     }
 
     public int updateDrawMatch(int id) throws SQLException {
         User gr = getGrade(id);
-        String query = "UPDATE user SET `DrawMatch` = ?, `CurrentWinStreak` = 0, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
+        String query = "UPDATE user SET `DrawMatch` = ?, `CurrentWinStreak` = 0, `CurrentLoseStreak` = 0, `Grade` = ? WHERE `UserId` = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         int value = gr.getDrawMatch() + 1;
+        int grade = gr.getGrade() + 1;
         p.setInt(1, value);
-        p.setInt(2, id);
+        p.setInt(2, grade);
+        p.setInt(3, id);
         int rs = p.executeUpdate();
         return rs;
     }
-    public int updateWin(int id) throws SQLException{
+
+    public int updateWin(int id) throws SQLException {
         User gr = getGrade(id);
         String query = "UPDATE user SET `WinMatch` = ?, `CurrentWinStreak` = ?, `CurrentLoseStreak` = 0 WHERE `UserId` = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
-        int value = gr.getWinMatch()+1;
-        int value1 = gr.getCurrentWinStreak()+1;
+        int value = gr.getWinMatch() + 1;
+        int value1 = gr.getCurrentWinStreak() + 1;
         p.setInt(1, value);
         p.setInt(2, value1);
         p.setInt(3, id);
         int rs = p.executeUpdate();
         return rs;
     }
-    public int updateLose(int id) throws SQLException{
+
+    public int updateLose(int id) throws SQLException {
         User gr = getGrade(id);
         String query = "UPDATE user SET `LoseMatch` = ?, `CurrentLoseStreak` = ?, `CurrentWinStreak` = 0 WHERE `UserId` = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
-        int value = gr.getLoseMatch()+1;
-        int value1 = gr.getCurrentLoseStreak()+1;
+        int value = gr.getLoseMatch() + 1;
+        int value1 = gr.getCurrentLoseStreak() + 1;
         p.setInt(1, value);
         p.setInt(2, value1);
         p.setInt(3, id);
         int rs = p.executeUpdate();
         return rs;
     }
+
     public ArrayList getRank() throws SQLException {
-        String query = "SELECT * from user ORDER BY Grade DESC";
+        String query = "SELECT * from user WHERE Grade > 15 ORDER BY Grade DESC";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         ResultSet rs = p.executeQuery();
         ArrayList<User> gradeList = new ArrayList<>();
@@ -327,7 +344,7 @@ public class UserDAL extends DatabaseConnection {
         return gradeList;
     }
 
-    public int setStatus(int id, int status) throws SQLException{
+    public int setStatus(int id, int status) throws SQLException {
         String query = "UPDATE user SET Status = ? Where UserID = ?";
         PreparedStatement p = this.getConnection().prepareStatement(query);
         p.setInt(1, status);
@@ -335,6 +352,7 @@ public class UserDAL extends DatabaseConnection {
         int rs = p.executeUpdate();
         return rs;
     }
+
     public User getInfo(int id) throws SQLException {
         String query = "SELECT * FROM user WHERE userID = ? AND isBlocked = 1";
         PreparedStatement p = this.getConnection().prepareStatement(query);

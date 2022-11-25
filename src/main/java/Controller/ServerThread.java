@@ -176,6 +176,7 @@ public class ServerThread implements Runnable {
             try {
                 System.out.println("Client is closed");
                 userDAL.setStatus(user.getUserId(), 0);
+                isLogin = false;
             } catch (SQLException e) {
                 System.out.println("Error");
             }
@@ -439,6 +440,7 @@ public class ServerThread implements Runnable {
     }
 
     public void userStatus(String[] part) {
+        
         try {
             List<User> l = userDAL.findUserOnline();
             String msg = "UserStatus;" + String.valueOf(l.size());
@@ -453,8 +455,10 @@ public class ServerThread implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Error");
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
+         
+        
     }
 
     public void logout(String[] part) {
@@ -532,10 +536,12 @@ public class ServerThread implements Runnable {
         try {
             String msg = "DrawConfirm;";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+            room.getCompetitor(this.name).userDAL.setStatus(room.getCompetitor(this.name).user.getUserId(), 1);
             room.getCompetitor(this.name).push(encryptedOutput);
-            String msg1 = "DrawConfirm;";
-            byte[] encryptedOutput1 = sc.symmetricEncryption(msg1);
-            push(encryptedOutput1);
+            msg = "DrawConfirm;";
+            encryptedOutput = sc.symmetricEncryption(msg);
+            userDAL.setStatus(user.getUserId(), 1);
+            push(encryptedOutput);
         } catch (Exception ex) {
             System.out.println("Error");
         }
@@ -559,9 +565,11 @@ public class ServerThread implements Runnable {
         try {
             String msg = "SurrenderConfirm;";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+            room.getCompetitor(this.name).userDAL.setStatus(room.getCompetitor(this.name).user.getUserId(), 1);
             room.getCompetitor(this.name).push(encryptedOutput);
             msg = "SurrenderConfirm;";
             encryptedOutput = sc.symmetricEncryption(msg);
+            userDAL.setStatus(user.getUserId(), 1);
             push(encryptedOutput);
         } catch (Exception ex) {
             System.out.println("Error");
@@ -576,7 +584,7 @@ public class ServerThread implements Runnable {
                     this.room = client.room;
                     System.out.println("Entered the room " + room.getID());
                     userDAL.setStatus(this.user.getUserId(), 2);
-                    room.getCompetitor(this.name).userDAL.setStatus(this.user.getUserId(), 2);
+                    room.getCompetitor(this.name).userDAL.setStatus(room.getCompetitor(this.name).user.getUserId(), 2);
                     goToPartnerRoom();
                     break;
                 }
