@@ -335,4 +335,32 @@ public class UserDAL extends DatabaseConnection {
         int rs = p.executeUpdate();
         return rs;
     }
+    public User getInfo(int id) throws SQLException {
+        String query = "SELECT * FROM user WHERE userID = ? AND isBlocked = 1";
+        PreparedStatement p = this.getConnection().prepareStatement(query);
+        p.setInt(1, id);
+        ResultSet rs = p.executeQuery();
+        User us = new User();
+        if (rs != null) {
+            while (rs.next()) {
+                us.setUserId(rs.getInt("UserId"));
+                us.setUserName(rs.getString("Username"));
+                us.setPassword(rs.getString("Password"));
+                us.setNickname(rs.getString("Nickname"));
+                us.setSex(rs.getInt("Sex"));
+                us.setBirthday(rs.getDate("Birthday"));
+                us.setGrade(rs.getInt("Grade"));
+                us.setWinMatch(rs.getInt("WinMatch"));
+                us.setLoseMatch(rs.getInt("LoseMatch"));
+                us.setDrawMatch(rs.getInt("DrawMatch"));
+                us.setCurrentWinStreak(rs.getInt("CurrentWinStreak"));
+                us.setMaxWinStreak(rs.getInt("MaxWinStreak"));
+                us.setCurrentLoseStreak(rs.getInt("CurrentLoseStreak"));
+                us.setMaxLoseStreak(rs.getInt("MaxLoseStreak"));
+                us.setIsBlocked(rs.getInt("isBlocked"));
+            }
+        }
+        return us;
+    }
+
 }

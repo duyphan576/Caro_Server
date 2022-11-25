@@ -163,6 +163,8 @@ public class ServerThread implements Runnable {
                     changePassword(part);
                 } else if (part[0].equals("ChangeInfo")) {
                     changeInfo(part);
+                } else if (part[0].equals("GetInfo")) {
+                    getInfo(part[1]);
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -270,7 +272,7 @@ public class ServerThread implements Runnable {
     }
 
     public void changeInfo(String[] part) {
-        
+
         try {
             User us = new User();
             us.setUserId(Integer.parseInt(part[1]));
@@ -287,7 +289,7 @@ public class ServerThread implements Runnable {
         } catch (Exception ex) {
             Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     public void joinRoom(String[] part) {
@@ -560,6 +562,17 @@ public class ServerThread implements Runnable {
                     break;
                 }
             }
+        } catch (Exception ex) {
+            System.out.println("Error");
+        }
+    }
+
+    public void getInfo(String a) {
+        try {
+            user= userDAL.getInfo(Integer.parseInt(a));
+            String msg = "GetInfo;"+getStringFromUser(user);
+            byte[] encryptedOutput = sc.symmetricEncryption(msg);
+            push(encryptedOutput);
         } catch (Exception ex) {
             System.out.println("Error");
         }
