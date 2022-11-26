@@ -166,6 +166,8 @@ public class ServerThread implements Runnable {
                     changeInfo(part);
                 } else if (part[0].equals("GetInfo")) {
                     getInfo(part[1]);
+                }else if (part[0].equals("DrawRefuse")) {
+                    drawRefuse();
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
@@ -602,6 +604,15 @@ public class ServerThread implements Runnable {
             push(encryptedOutput);
         } catch (Exception ex) {
             System.out.println("Error");
+        }
+    }
+    public void drawRefuse(){
+        try {
+            String msg = "DrawRefuse;";
+            byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
+            room.getCompetitor(this.name).push(encryptedOutput);
+        } catch (Exception ex) {
+            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
