@@ -167,7 +167,7 @@ public class ServerThread implements Runnable {
                     changeInfo(part);
                 } else if (part[0].equals("GetInfo")) {
                     getInfo(part[1]);
-                }else if (part[0].equals("DrawRefuse")) {
+                } else if (part[0].equals("DrawRefuse")) {
                     drawRefuse();
                 }else if (part[0].equals("Lose")) {
                     lose(part[1],part[2]);
@@ -374,7 +374,13 @@ public class ServerThread implements Runnable {
                 push(encryptedOutput);
             }
         } catch (Exception ex) {
-            String msg = "Error;Username or Password is uncorrect.";
+            try {
+                String msg = "Error;Username or Password is uncorrect.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -399,7 +405,13 @@ public class ServerThread implements Runnable {
                 push(encryptedOutput);
             }
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
 
     }
@@ -420,7 +432,13 @@ public class ServerThread implements Runnable {
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             push(encryptedOutput);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -435,7 +453,13 @@ public class ServerThread implements Runnable {
                 push(encryptedOutput);
                 System.out.println("Create new room successfully, password is " + part[1]);
             } catch (Exception ex) {
-                System.out.println("Error");
+                try {
+                    String msg = "Error;Something wrong, please try again.";
+                    byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                    push(encryptedOutput);
+                } catch (Exception e) {
+                    System.out.println("Error");
+                }
             }
         } else {
             try {
@@ -445,7 +469,13 @@ public class ServerThread implements Runnable {
                 push(encryptedOutput);
                 System.out.println("Create new room successfully");
             } catch (Exception ex) {
-                System.out.println("Error");
+                try {
+                    String msg = "Error;Something wrong, please try again.";
+                    byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                    push(encryptedOutput);
+                } catch (Exception e) {
+                    System.out.println("Error");
+                }
             }
         }
     }
@@ -466,7 +496,13 @@ public class ServerThread implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
 
     }
@@ -478,7 +514,13 @@ public class ServerThread implements Runnable {
             push(encryptedOutput);
             userDAL.setStatus(Integer.parseInt(part[1]), 0);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -493,7 +535,13 @@ public class ServerThread implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -504,7 +552,13 @@ public class ServerThread implements Runnable {
             // Write to client: byte[] encryptedOutput
             room.getCompetitor(this.name).push(encryptedOutput);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -516,7 +570,13 @@ public class ServerThread implements Runnable {
             byte[] encryptedOutput1 = sc.symmetricEncryption(msg);
             push(encryptedOutput1);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -526,7 +586,13 @@ public class ServerThread implements Runnable {
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             room.getCompetitor(this.name).push(encryptedOutput);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -538,7 +604,13 @@ public class ServerThread implements Runnable {
             byte[] encryptedOutput1 = sc.symmetricEncryption(msg);
             push(encryptedOutput1);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -553,7 +625,13 @@ public class ServerThread implements Runnable {
             userDAL.setStatus(user.getUserId(), 1);
             push(encryptedOutput);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
 
     }
@@ -567,7 +645,13 @@ public class ServerThread implements Runnable {
             byte[] encryptedOutput1 = sc.symmetricEncryption(msg1);
             push(encryptedOutput1);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -582,7 +666,13 @@ public class ServerThread implements Runnable {
             userDAL.setStatus(user.getUserId(), 1);
             push(encryptedOutput);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -600,7 +690,13 @@ public class ServerThread implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
 
@@ -611,16 +707,29 @@ public class ServerThread implements Runnable {
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             push(encryptedOutput);
         } catch (Exception ex) {
-            System.out.println("Error");
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
-    public void drawRefuse(){
+
+    public void drawRefuse() {
         try {
             String msg = "DrawRefuse;";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             room.getCompetitor(this.name).push(encryptedOutput);
         } catch (Exception ex) {
-            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                String msg = "Error;Something wrong, please try again.";
+                byte[] encryptedOutput = sc.symmetricEncryption(msg);
+                push(encryptedOutput);
+            } catch (Exception e) {
+                System.out.println("Error");
+            }
         }
     }
     public void lose(String a,String b){
