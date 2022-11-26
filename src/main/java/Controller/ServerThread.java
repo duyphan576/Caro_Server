@@ -111,6 +111,7 @@ public class ServerThread implements Runnable {
                 System.out.println(encryptedMsg);
                 if (part[0].equals("Exit")) {
                     userDAL.setStatus(Integer.parseInt(part[1]), 0);
+                    userStatus();
                     break;
                 } else if (part[0].equals("Register")) {
                     register(part);
@@ -119,7 +120,7 @@ public class ServerThread implements Runnable {
                 } else if (part[0].equals("Login")) {
                     login(part);
                 } else if (part[0].equals("UserStatus")) {
-                    userStatus(part);
+                    userStatus();
                 } else if (part[0].equals("CreateRoom")) {
                     createRoom(part);
                 } else if (part[0].equals("Logout")) {
@@ -173,6 +174,8 @@ public class ServerThread implements Runnable {
                 }
             }
             System.out.println("Closed socket for client " + socket.toString());
+            clientList.remove(this);
+            isLogin = false;
             in.close();
             out.close();
             socket.close();
@@ -180,6 +183,7 @@ public class ServerThread implements Runnable {
             try {
                 if (user != null) {
                     userDAL.setStatus(user.getUserId(), 0);
+                    userStatus();
                 }
                 isLogin = false;
                 clientList.remove(this);
@@ -479,7 +483,7 @@ public class ServerThread implements Runnable {
         }
     }
 
-    public void userStatus(String[] part) {
+    public void userStatus() {
 
         try {
             List<User> l = userDAL.findUserOnline();

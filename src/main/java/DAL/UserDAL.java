@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -111,7 +112,7 @@ public class UserDAL extends DatabaseConnection {
     }
 
     public ArrayList findUserOnline() throws SQLException {
-        String sql = "Select UserId, Nickname, Status From user ";
+        String sql = "Select UserId, Nickname, Status From user";
         ArrayList<User> list = new ArrayList();
         PreparedStatement p = this.getConnection().prepareStatement(sql);
         ResultSet rs = p.executeQuery();
@@ -381,4 +382,45 @@ public class UserDAL extends DatabaseConnection {
         return us;
     }
 
+    public int blockUser(int id) throws SQLException {
+        String query = "UPDATE user SET `isBlocked` = 0 WHERE `UserId` = ?";
+        PreparedStatement p = this.getConnection().prepareStatement(query);
+        p.setInt(1, id);
+        int rs = p.executeUpdate();
+        return rs;
+    }
+    
+    public ArrayList listUserOnline() throws SQLException {
+        String sql = "Select UserId, Nickname From user where Status = 1 or Status = 2";
+        ArrayList<User> list = new ArrayList();
+        PreparedStatement p = this.getConnection().prepareStatement(sql);
+        ResultSet rs = p.executeQuery();
+        if (rs != null) {
+            while (rs.next()) {
+                User us = new User();
+                us.setUserId(rs.getInt("UserId"));
+                us.setNickname(rs.getString("Nickname"));
+                us.setStatus(rs.getInt("Status"));
+                list.add(us);
+            }
+        }
+        return list;
+    }
+    
+    public ArrayList topUser() throws SQLException {
+        String sql = "SELECT UserId, Nickname, WinMatch FROM user WHERE WinMatch = (SELECT MAX(WinMatch) from user);";
+        ArrayList<User> list = new ArrayList();
+        PreparedStatement p = this.getConnection().prepareStatement(sql);
+        ResultSet rs = p.executeQuery();
+        if (rs != null) {
+            while (rs.next()) {
+                User us = new User();
+                us.setUserId(rs.getInt("UserId"));
+                us.setNickname(rs.getString("Nickname"));
+                us.setStatus(rs.getInt("WinMatch"));
+                list.add(us);
+            }
+        }
+        return list;
+    }
 }
