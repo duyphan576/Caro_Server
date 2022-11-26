@@ -27,7 +27,6 @@ import java.util.logging.Logger;
  * @author duyph
  */
 public class ServerThread implements Runnable {
-
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
@@ -657,11 +656,11 @@ public class ServerThread implements Runnable {
 
     public void surrenderConfirm() {
         try {
-            String msg = "SurrenderConfirm;";
+            String msg = "SurrenderConfirm;true";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             room.getCompetitor(this.name).userDAL.setStatus(room.getCompetitor(this.name).user.getUserId(), 1);
             room.getCompetitor(this.name).push(encryptedOutput);
-            msg = "SurrenderConfirm;";
+            msg = "SurrenderConfirm;false";
             encryptedOutput = sc.symmetricEncryption(msg);
             userDAL.setStatus(user.getUserId(), 1);
             push(encryptedOutput);
