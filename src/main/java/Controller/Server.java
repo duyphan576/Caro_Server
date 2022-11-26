@@ -8,8 +8,12 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.Instant;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.jsoup.Connection;
@@ -26,7 +30,7 @@ public class Server {
     public static int roomId;
     public static Vector<ServerThread> clientList = new Vector<>();
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         try {
             InetAddress ip;
             ip = InetAddress.getLocalHost();
@@ -44,6 +48,9 @@ public class Server {
                     TimeUnit.SECONDS,
                     new ArrayBlockingQueue<>(8) // queueCapacity
             );
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            CheckTime ct = new CheckTime();
+            ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(ct, 300, 1, TimeUnit.SECONDS);
             int i = 1;
             roomId = 1000;
             while (true) {
@@ -51,10 +58,17 @@ public class Server {
                 ServerThread client = new ServerThread(socket, Integer.toString(i++));
                 clientList.add(client);
                 executor.execute(client);
+                scheduledFuture.cancel(true);
             }
         } catch (IOException e) {
             System.out.println(e);
         }
     }
+}
 
+class CheckTime implements Runnable {
+    @Override
+    public void run() {
+        System.out.println("Stop server. Time " + Instant.now());
+    }
 }

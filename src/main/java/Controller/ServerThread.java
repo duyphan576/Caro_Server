@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import static Controller.Server.clientList;
 import Crypto.ServerCryptography;
 import DAL.UserDAL;
 import Model.User;
@@ -174,10 +175,16 @@ public class ServerThread implements Runnable {
             socket.close();
         } catch (Exception ex) {
             try {
-                System.out.println("Client is closed");
-                userDAL.setStatus(user.getUserId(), 0);
+                if (user != null) {
+                    userDAL.setStatus(user.getUserId(), 0);
+                }
                 isLogin = false;
-            } catch (SQLException e) {
+                clientList.remove(this);
+                System.out.println("Closed socket for client " + socket.toString());
+                in.close();
+                out.close();
+                socket.close();
+            } catch (Exception e) {
                 System.out.println("Error");
             }
         }
@@ -293,7 +300,7 @@ public class ServerThread implements Runnable {
             byte[] encryptedOutput = sc.symmetricEncryption(msg);
             push(encryptedOutput);
         } catch (Exception ex) {
-            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error");
         }
 
     }
@@ -440,7 +447,7 @@ public class ServerThread implements Runnable {
     }
 
     public void userStatus(String[] part) {
-        
+
         try {
             List<User> l = userDAL.findUserOnline();
             String msg = "UserStatus;" + String.valueOf(l.size());
@@ -455,10 +462,9 @@ public class ServerThread implements Runnable {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(ServerThread.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Error");
         }
-         
-        
+
     }
 
     public void logout(String[] part) {
