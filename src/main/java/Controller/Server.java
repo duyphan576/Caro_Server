@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import GUI.ServerGUI;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -29,6 +30,7 @@ public class Server {
     public static Socket socket;
     public static int roomId;
     public static Vector<ServerThread> clientList = new Vector<>();
+    public static volatile ServerGUI ui;
 
     public static void main(String[] args) {
         try {
@@ -53,6 +55,8 @@ public class Server {
             ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(ct, 300, 1, TimeUnit.SECONDS);
             int i = 1;
             roomId = 1000;
+            ui = new ServerGUI();
+            ui.run();
             while (true) {
                 socket = server.accept();
                 ServerThread client = new ServerThread(socket, Integer.toString(i++));

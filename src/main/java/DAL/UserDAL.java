@@ -389,9 +389,17 @@ public class UserDAL extends DatabaseConnection {
         int rs = p.executeUpdate();
         return rs;
     }
-    
+
+    public int unblockUser(int id) throws SQLException {
+        String query = "UPDATE user SET `isBlocked` = 1 WHERE `UserId` = ?";
+        PreparedStatement p = this.getConnection().prepareStatement(query);
+        p.setInt(1, id);
+        int rs = p.executeUpdate();
+        return rs;
+    }
+
     public ArrayList listUserOnline() throws SQLException {
-        String sql = "Select UserId, Nickname From user where Status = 1 or Status = 2";
+        String sql = "Select UserId, Nickname, Status, isBlocked From user where Status = 1 or Status = 2";
         ArrayList<User> list = new ArrayList();
         PreparedStatement p = this.getConnection().prepareStatement(sql);
         ResultSet rs = p.executeQuery();
@@ -401,12 +409,13 @@ public class UserDAL extends DatabaseConnection {
                 us.setUserId(rs.getInt("UserId"));
                 us.setNickname(rs.getString("Nickname"));
                 us.setStatus(rs.getInt("Status"));
+                us.setIsBlocked(rs.getInt("isBlocked"));
                 list.add(us);
             }
         }
         return list;
     }
-    
+
     public ArrayList topUser() throws SQLException {
         String sql = "SELECT UserId, Nickname, WinMatch FROM user WHERE WinMatch = (SELECT MAX(WinMatch) from user);";
         ArrayList<User> list = new ArrayList();

@@ -46,7 +46,6 @@ public class ServerThread implements Runnable {
         sc = new ServerCryptography();
         userDAL = new UserDAL();
         room = null;
-        //Trường hợp test máy ở server sẽ lỗi do hostaddress là localhost
         if (this.socket.getInetAddress().getHostAddress().equals("127.0.0.1")) {
             clientIP = "127.0.0.1";
         } else {
@@ -570,8 +569,10 @@ public class ServerThread implements Runnable {
             String msg = "AgainRefuse;";
             byte[] encryptedOutput = room.getCompetitor(this.name).sc.symmetricEncryption(msg);
             room.getCompetitor(this.name).push(encryptedOutput);
+            room.getCompetitor(this.name).userDAL.setStatus(room.getCompetitor(this.name).getUser().getUserId(), 1);
             byte[] encryptedOutput1 = sc.symmetricEncryption(msg);
             push(encryptedOutput1);
+            userDAL.setStatus(user.getUserId(), 1);
         } catch (Exception ex) {
             try {
                 String msg = "Error;Something wrong, please try again.";
